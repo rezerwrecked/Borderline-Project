@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Borderline Project</title>
+    <meta name="description" content="Listen to the full tracks, with synced lyrics.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Borderline Project">
+    <meta property="og:description" content="Listen to the full tracks, with synced lyrics.">
+    <meta property="og:image" content="https://borderlinemusic.rslumkoski.workers.dev/og-image.jpg">
+    <meta property="og:url" content="https://borderlinemusic.rslumkoski.workers.dev/">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="theme-color" content="#031a13">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Borderline">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="icon" type="image/png" href="icon-192.png">
+    <!-- tailwind.css is a precompiled subset containing only the utilities this page
+         already used. New utility classes will not exist in it: add styles to the
+         <style> block below instead. -->
+    <link rel="stylesheet" href="tailwind.css">
+    <style>
+        body {
+            /* Overridden per album when the switcher changes. */
+            --album-bg: url('bg-wide.webp');
+            --album-bg-tall: url('bg-tall.webp');
+            /* Overridden per album (see applyAlbumAccent). */
+            --accent: #34d399;
+            --accent-light: #6ee7b7;
+            --accent-soft: rgba(52, 211, 153, 0.2);
+            --accent-border: rgba(52, 211, 153, 0.45);
+            --accent-glow: rgba(52, 211, 153, 0.3);
+            --accent-bar: rgba(16, 185, 129, 0.18);
+            background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), var(--album-bg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .glass {
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--accent-soft);
+        }
+        .emerald-glow {
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .custom-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Standalone on iPhone: keep the glass clear of the notch and home bar. */
+        body.safe-area {
+            padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+            padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+            padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
+        }
+        @media (min-width: 768px) {
+            body.safe-area {
+                padding-top: max(1rem, env(safe-area-inset-top, 0px));
+                padding-right: max(1rem, env(safe-area-inset-right, 0px));
+                padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+                padding-left: max(1rem, env(safe-area-inset-left, 0px));
+            }
+        }
+        @media (max-width: 767.98px) {
+            body { height: 100dvh !important; background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), var(--album-bg-tall) !important; }
+            .glass { height: calc(100dvh - 1rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important; padding: 0.75rem !important; gap: 0.5rem !important; }
+            #lyrics-container {
+                -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
+                mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
+            }
+            #playlist-panel { display: none; position: fixed; left: 0; right: 0; bottom: 0; height: 70%; z-index: 50; padding: 1rem; padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); background: rgba(10,10,10,0.97); border-top: 1px solid var(--accent-border); border-radius: 1.5rem 1.5rem 0 0; }
+            #playlist-panel.open { display: flex; }
+        }
+        #lyrics-container {
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
+        }
+        @media (min-width: 768px) and (max-height: 640px) {
+            body { height: 100dvh !important; padding: max(0.5rem, env(safe-area-inset-top, 0px)) max(0.5rem, env(safe-area-inset-right, 0px)) max(0.5rem, env(safe-area-inset-bottom, 0px)) max(0.5rem, env(safe-area-inset-left, 0px)) !important; }
+            .glass { height: calc(100dvh - 1rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important; padding: 0.75rem 1rem !important; gap: 0.75rem !important; }
+            #song-title { font-size: 1.25rem !important; margin-bottom: 0 !important; }
+            #song-artist { font-size: 0.7rem !important; margin-bottom: 0.25rem !important; }
+            #seek-bar { margin-bottom: 0.5rem !important; }
+            #play-btn { width: 2.75rem !important; height: 2.75rem !important; font-size: 1rem !important; }
+            #extra-row { margin-top: 0.25rem !important; }
+            #install-btn { display: none !important; }
+            #lyrics-container { padding-top: 30% !important; padding-bottom: 30% !important; font-size: 1.05rem !important; }
+        }
+        @keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .arrow-nudge { animation: nudge 1.6s ease-in-out infinite; }
+        .lyric-line {
+            display: block;
+            width: 100%;
+            background: none;
+            border: 0;
+            padding: 0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .lyric-active {
+            color: var(--accent-light);
+            transform: scale(1.15);
+            text-shadow: 0 0 10px var(--accent-glow);
+            font-weight: bold;
+        }
+        /* Tall artwork card in the play/title area: blurred fill behind the
+           untouched square cover, so nothing gets cropped. */
+        #album-frame {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: min(100%, 18rem, 30vh);
+            aspect-ratio: 4 / 5;
+            margin-bottom: 1.5rem;
+            border-radius: 1rem;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #0b1512;
+        }
+        #album-backdrop {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(18px) brightness(0.55) saturate(1.1);
+            transform: scale(1.18);
+            transform-origin: center;
+        }
+        #album-cover {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            height: auto;
+            border-radius: 0.75rem;
+        }
+        /* Ambient light behind the sleeve. It only breathes while audio is
+           playing, so a paused player sits still. */
+        #album-glow {
+            position: absolute;
+            inset: -12%;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(closest-side at 50% 50%, var(--accent-border), var(--accent-soft) 60%, transparent 100%);
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        body.is-playing #album-glow {
+            opacity: 1;
+            animation: album-glow 3.6s ease-in-out infinite;
+        }
+        @keyframes album-glow {
+            0%, 100% { opacity: 0.5; transform: scale(0.94); }
+            50% { opacity: 1; transform: scale(1.06); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            body.is-playing #album-glow { animation: none; opacity: 0.75; transform: none; }
+            #album-glow { transition: opacity 0.3s ease; }
+        }
+        /* Mobile-only switch between the tall artwork and the lyrics. */
+        #mobile-view-switch {
+            display: inline-flex;
+            gap: 0.2rem;
+            padding: 0.2rem;
+            margin-bottom: 0.75rem;
+            border-radius: 9999px;
+            background: rgba(10, 15, 12, 0.7);
+            border: 1px solid var(--accent-soft);
+            flex-shrink: 0;
+        }
+        #mobile-view-switch button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.75rem;
+            padding: 0.38rem 0.85rem;
+            border: 0;
+            border-radius: 9999px;
+            background: transparent;
+            color: #9ca3af;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        #mobile-view-switch button:hover { color: var(--accent-light); }
+        #mobile-view-switch button[aria-pressed="true"] {
+            background: var(--accent-bar);
+            color: var(--accent-light);
+        }
+        #mobile-view-switch button:focus-visible { outline: 2px solid var(--accent-light); outline-offset: 2px; }
+        @media (min-width: 768px) { #mobile-view-switch { display: none; } }
+        @media (max-width: 767.98px) {
+            /* Lyrics are the starting view, so the artwork starts hidden. */
+            #album-frame { display: none; width: min(70vw, 20rem, 40vh); margin-bottom: 0.75rem; }
+            body.artwork-view #album-frame { display: flex; }
+            body.artwork-view #track-info { flex: 1 1 auto; justify-content: flex-start; }
+            body.artwork-view #album-frame { margin-top: auto; margin-bottom: auto; }
+            body.artwork-view #lyrics-panel { display: none; }
+            /* The tall artwork takes the space the fade padding used. */
+            #lyrics-container { padding-top: 2rem; padding-bottom: 2rem; }
+            #song-title, #song-artist { display: none; }
+            #song-title-mobile { font-size: clamp(1.25rem, 6vw, 1.5rem); line-height: 1.25; margin-bottom: 0.25rem; }
+            #song-artist-mobile { line-height: 1.3; }
+        }
+        @media (min-width: 768px) and (max-height: 640px) {
+            #album-frame { width: 10rem; margin-bottom: 0.75rem; }
+        }
+        /* Short phones: the artwork yields height so the new control rows stay
+           inside the glass. */
+        @media (max-width: 767.98px) and (max-height: 700px) {
+            #album-frame { width: min(55vw, 14rem, 26vh); margin-bottom: 0.5rem; }
+            #mobile-view-switch { margin-bottom: 0.35rem; }
+            #song-title-mobile { font-size: clamp(1.15rem, 5.2vw, 1.4rem); margin-bottom: 0.15rem; }
+            #song-artist-mobile { font-size: 0.9rem; }
+        }
+        /* Inline SVG icons, replacing the Font Awesome CDN stylesheet. */
+        .icon {
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vertical-align: -0.125em;
+            flex-shrink: 0;
+        }
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2.5rem;
+            min-height: 2.5rem;
+            border-radius: 0.5rem;
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+        .icon-btn:hover { background: var(--accent-soft); }
+        .icon-btn:focus-visible { outline: 2px solid var(--accent-light); outline-offset: 2px; }
+        @media (max-width: 767.98px) {
+            .icon-btn { min-width: 2.75rem; min-height: 2.75rem; }
+        }
+        #play-btn:focus-visible, #seek-bar:focus-visible, #volume-slider:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 3px;
+        }
+        #controls-row { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem; }
+        #transport { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        #secondary-controls { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+        #secondary-actions { display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; }
+        #volume-row { flex: 1; max-width: 9rem; }
+        @media (min-width: 768px) {
+            #transport { gap: 0.75rem; }
+            #transport .icon-btn { min-width: 2.25rem; min-height: 2.25rem; }
+        }
+        /* The player column is only ~170px wide on a 768px screen: keep the five
+           transport controls inside it until the column can afford more. */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            #transport { gap: 0.125rem; }
+            #transport .icon-btn { min-width: 1.75rem; min-height: 1.75rem; }
+            #play-btn { width: 3rem; height: 3rem; font-size: 1.1rem; }
+        }
+        @media (min-width: 1200px) {
+            #transport { gap: 1.5rem; }
+        }
+        #install-btn .install-label { display: none; }
+        #install-btn { gap: 0.4rem; padding-inline: 0.4rem; }
+        /* .hidden alone loses to .icon-btn's display rule, so scope it to the button. */
+        #install-btn.hidden { display: none !important; }
+        @media (min-width: 1440px) {
+            #install-btn .install-label { display: inline; }
+        }
+        .track-play {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 2.75rem;
+        }
+        .album-thumb {
+            width: 2rem;
+            height: 2rem;
+            flex: none;
+            object-fit: cover;
+            border-radius: 0.375rem;
+            border: 1px solid rgba(75, 85, 99, 0.6);
+        }
+        #list-tabs button[aria-pressed="true"] .album-thumb { border-color: var(--accent-border); }
+        #tracks-btn { min-height: 2.75rem; }
+        #shuffle-btn.is-on, #repeat-btn.is-on { color: var(--accent); background: var(--accent-bar); }
+        #repeat-btn { position: relative; }
+        #repeat-badge {
+            position: absolute;
+            right: 0.2rem;
+            bottom: 0.15rem;
+            font-size: 0.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--accent-light);
+        }
+        #track-search {
+            width: 100%;
+            padding: 0.45rem 0.65rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--accent-soft);
+            background: rgba(0, 0, 0, 0.35);
+            color: #e5e7eb;
+            font-size: 0.75rem;
+        }
+        #track-search::placeholder { color: #6b7280; }
+        #track-search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+        /* The playlist column is narrow at tablet widths: let the badge drop
+           below the heading instead of pushing it out of the column. */
+        #tracks-header { flex-wrap: wrap; gap: 0.25rem 0.5rem; }
+        #tracks-header > div { margin-left: auto; }
+        /* `.icon-btn` has the same specificity as `md:hidden`, so hide by id. */
+        @media (min-width: 768px) { #close-tracks { display: none; } }
+        /* Album and track download badges share the circular progress ring.
+           `.icon-btn` outranks the hidden attribute, so hide by id. */
+        #album-download, [data-download] {
+            flex-shrink: 0;
+            position: relative;
+            border-radius: 50%;
+        }
+        #album-download[hidden] { display: none !important; }
+        #album-download[aria-disabled="true"] { cursor: default; }
+        /* Registered so the ring fills smoothly between progress messages. */
+        @property --ring-progress {
+            syntax: '<number>';
+            inherits: true;
+            initial-value: 0;
+        }
+        #album-download, [data-download] {
+            --ring-progress: 0;
+            transition: --ring-progress 0.3s ease;
+        }
+        #album-download::after, [data-download]::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent) calc(var(--ring-progress) * 1%), var(--accent-soft) 0);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+        #album-download.download-active::after, [data-download].download-active::after { opacity: 1; }
+        .track-duration {
+            font-variant-numeric: tabular-nums;
+            font-size: 0.7rem;
+            color: #6b7280;
+        }
+        .search-summary {
+            padding: 0.15rem 0.5rem 0.4rem;
+            font-size: 0.65rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+        .empty-note { color: #a1a1aa; }
+        #offline-manager {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.5rem;
+            flex-shrink: 0;
+            margin-top: 0.6rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid rgba(75, 85, 99, 0.45);
+        }
+        #offline-manager.visible { display: flex; }
+        #offline-summary { flex: 1 1 auto; font-size: 0.68rem; line-height: 1.3; color: #9ca3af; }
+        @media (min-width: 768px) {
+            /* The desktop playlist column is narrow: stack rather than squeeze. */
+            #offline-manager { flex-direction: column; align-items: stretch; }
+            #clear-offline { min-height: 2.25rem; }
+        }
+        #clear-offline {
+            flex-shrink: 0;
+            min-height: 2.75rem;
+            padding: 0 0.8rem;
+            border-radius: 9999px;
+            border: 1px solid var(--accent-border);
+            background: var(--accent-bar);
+            color: var(--accent-light);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        #clear-offline:hover { background: var(--accent-soft); }
+        #clear-offline:focus-visible { outline: 2px solid var(--accent-light); outline-offset: 2px; }
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+            transform: translateX(-50%) translateY(0.5rem);
+            z-index: 60;
+            padding: 0.5rem 0.9rem;
+            border-radius: 9999px;
+            background: rgba(6, 20, 15, 0.95);
+            border: 1px solid var(--accent-border);
+            color: #d1fae5;
+            font-size: 0.75rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        /* Per-album accent applied over the utility classes above. */
+        #play-btn { background-color: var(--accent) !important; color: #07130f; }
+        #play-btn:hover { background-color: var(--accent-light) !important; }
+        #seek-bar, #volume-slider { accent-color: var(--accent); }
+        #song-artist, #song-artist-mobile, #tracks-btn, #playlist-panel h3 { color: var(--accent); }
+        #close-tracks:hover, #prev-btn:hover, #next-btn:hover,
+        #shuffle-btn:hover, #repeat-btn:hover, #share-btn:hover { color: var(--accent-light); }
+        #quality-badge { color: var(--accent-light); }
+        #install-btn { color: var(--accent-light); border-color: var(--accent-border); }
+        #install-btn:hover { background: var(--accent-soft); }
+        .track-row.is-active { background-color: var(--accent-soft); border-color: var(--accent-border); }
+        .track-row.is-active .track-play { color: var(--accent); }
+        .album-tab { border-color: #374151; }
+        .album-tab:hover { border-color: var(--accent-border); }
+        .album-tab.is-active { background-color: var(--accent-soft); border-color: var(--accent-border); }
+        .album-tab-title { color: #d1d5db; }
+        .album-tab.is-active .album-tab-title { color: var(--accent); }
+        .download-idle { color: #6b7280; }
+        .download-idle:hover { color: var(--accent); }
+        .download-active { color: var(--accent-light); }
+        .download-cached { color: var(--accent); opacity: 0.85; }
+        .download-cached:hover { color: #fcd34d; }
+        #shortcuts-btn { display: none; }
+        @media (min-width: 768px) {
+            #shortcuts-btn { display: inline-flex; font-weight: 700; }
+        }
+        #shortcut-help {
+            position: fixed;
+            inset: 0;
+            z-index: 70;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        #shortcut-help.open { display: flex; }
+        .shortcut-card {
+            width: min(23rem, 100%);
+            max-height: 80vh;
+            overflow: auto;
+            padding: 1.25rem 1.35rem;
+            border-radius: 1rem;
+            border: 1px solid var(--accent-border);
+            background: rgba(6, 16, 12, 0.97);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .shortcut-card h2 {
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+        .shortcut-list { display: grid; gap: 0.45rem; margin-bottom: 1rem; font-size: 0.8rem; }
+        .shortcut-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: #d1d5db; }
+        .shortcut-keys { display: inline-flex; gap: 0.25rem; flex-shrink: 0; }
+        .shortcut-row kbd {
+            padding: 0.15rem 0.4rem;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-bottom-width: 2px;
+            border-radius: 0.35rem;
+            background: rgba(255, 255, 255, 0.08);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.72rem;
+            color: #f3f4f6;
+            white-space: nowrap;
+        }
+        #shortcut-close {
+            width: 100%;
+            min-height: 2.5rem;
+            border-radius: 0.6rem;
+            border: 1px solid var(--accent-border);
+            background: var(--accent-bar);
+            color: var(--accent-light);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        #shortcut-close:hover { background: var(--accent-soft); }
+        #shortcut-close:focus-visible { outline: 2px solid var(--accent-light); outline-offset: 2px; }
+        #ios-tip {
+            left: calc(1rem + env(safe-area-inset-left, 0px));
+            right: calc(1rem + env(safe-area-inset-right, 0px));
+            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        }
+        .spin { animation: spin 0.9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            .arrow-nudge { animation: none; }
+            .lyric-line, #toast, #mobile-view-switch button { transition: none; }
+            .lyric-active { transform: none; }
+            .spin { animation-duration: 2.5s; }
+        }
+    </style>
+</head>
+<body class="safe-area text-gray-200 h-screen flex items-center justify-center p-2 md:p-4">
+
+    <!-- Icon sprite: one inline set instead of a CDN icon font. -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
+        <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+        <symbol id="i-chevron-up" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/></symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 4h4v16H7zM13 4h4v16h-4z" fill="currentColor" stroke="none"/></symbol>
+        <symbol id="i-prev" viewBox="0 0 24 24"><path d="M18 5v14L8 12z" fill="currentColor" stroke="none"/><path d="M6 5v14"/></symbol>
+        <symbol id="i-next" viewBox="0 0 24 24"><path d="M6 5v14l10-7z" fill="currentColor" stroke="none"/><path d="M18 5v14"/></symbol>
+        <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/></symbol>
+        <symbol id="i-install" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></symbol>
+        <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></symbol>
+        <symbol id="i-spinner" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-6.2-8.56"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l9.5 17H2.5z"/><path d="M12 9v5M12 17h.01"/></symbol>
+        <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/></symbol>
+        <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></symbol>
+        <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></symbol>
+    </svg>
+
+    <div class="glass w-full max-w-[90rem] h-[95vh] md:h-[85vh] rounded-3xl p-4 md:p-8 flex flex-col md:flex-row gap-4 md:gap-6 emerald-glow overflow-hidden custom-scrollbar">
+        
+        <!-- Left Column: Compact Playlist (Desktop: 15% width, Mobile: smaller height) -->
+        <div id="playlist-panel" role="region" class="flex-col md:flex md:w-[15%] md:h-full md:border-r border-gray-700/50 md:pr-4 md:shrink-0" aria-label="Tracks">
+            <div id="tracks-header" class="flex items-center justify-between mb-3 md:mb-4"><h3 class="text-base md:text-lg font-bold text-emerald-500 tracking-widest uppercase flex items-center gap-2"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg> Tracks</h3><div class="flex items-center gap-1"><button id="album-download" type="button" class="icon-btn shrink-0 text-xs download-idle" aria-label="Download the current album for offline listening" hidden><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg></button><button id="close-tracks" aria-label="Close track list" class="md:hidden icon-btn text-gray-400 hover:text-emerald-500 text-xl"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></div></div>
+            <div id="list-tabs" class="hidden flex-col gap-2 mb-3 md:mb-4" role="group" aria-label="Albums"></div>
+            <input id="track-search" type="search" placeholder="Search all tracks" autocomplete="off" spellcheck="false" aria-label="Search all tracks" hidden>
+            <div id="playlist-container" class="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                <!-- Playlist items populate here -->
+            </div>
+            <div id="offline-manager" role="group" aria-label="Offline storage">
+                <span id="offline-summary" aria-live="polite"></span>
+                <button id="clear-offline" type="button">Clear offline</button>
+            </div>
+        </div>
+
+        <!-- Center Column: Player Controls (Desktop: 30% width) -->
+        <div class="contents md:flex md:flex-col md:justify-between md:w-[30%] md:px-4 md:shrink-0">
+            <div id="track-info" class="order-1 md:order-none md:flex-1 flex flex-col items-center justify-center relative">
+                <div id="mobile-view-switch" role="group" aria-label="Choose artwork or lyrics">
+                    <button type="button" data-view="artwork" aria-pressed="false">Artwork</button>
+                    <button type="button" data-view="lyrics" aria-pressed="true">Lyrics</button>
+                </div>
+                <div id="album-frame">
+                    <img id="album-backdrop" src="cover1.webp" alt="" aria-hidden="true">
+                    <div id="album-glow" aria-hidden="true"></div>
+                    <img id="album-cover" src="cover1.webp" alt="Album Cover">
+                </div>
+                <h2 id="song-title" class="text-xl md:text-3xl font-bold text-white mb-0 md:mb-2 text-center">Loading...</h2>
+                <p id="song-artist" class="text-emerald-500 text-xs md:text-lg mb-2 md:mb-8 tracking-widest uppercase">Please wait</p>
+            </div>
+
+            <div class="w-full order-3 md:order-none">
+                <div class="md:hidden text-center mb-2">
+                    <h2 id="song-title-mobile" class="font-bold text-white text-center">Loading...</h2>
+                    <p id="song-artist-mobile" class="text-emerald-500 text-lg tracking-widest uppercase text-center">Please wait</p>
+                </div>
+                <div class="flex items-center justify-between text-xs md:text-sm text-gray-400 mb-2 gap-2">
+                    <span id="current-time">0:00</span>
+                    <span class="flex items-center justify-center gap-2 min-w-0">
+                        <span id="quality-badge" class="truncate text-[10px] font-bold uppercase tracking-widest text-emerald-400/80"></span>
+                        <span id="offline-badge" title="Only tracks marked as available offline can play" class="hidden shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-widest" style="color:#fbbf24"><svg class="icon" style="width:6px;height:6px" aria-hidden="true"><use href="#i-dot"/></svg>Offline</span>
+                    </span>
+                    <span id="total-time">0:00</span>
+                </div>
+                
+                <input type="range" id="seek-bar" aria-label="Playback position" value="0" min="0" max="100" step="1" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500 mb-4 md:mb-6">
+                
+                <div id="controls-row">
+                    <div id="transport">
+                        <button id="shuffle-btn" aria-label="Shuffle off" aria-pressed="false" title="Shuffle" class="icon-btn text-gray-400 hover:text-emerald-400"><svg class="icon" aria-hidden="true"><use href="#i-shuffle"/></svg></button>
+                        <button id="prev-btn" aria-label="Previous track" class="icon-btn text-gray-400 hover:text-emerald-500 transition text-xl md:text-2xl"><svg class="icon" aria-hidden="true"><use href="#i-prev"/></svg></button>
+                        <button id="play-btn" aria-label="Play" class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-emerald-500 text-black hover:bg-emerald-400 transition flex items-center justify-center text-xl md:text-2xl"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button>
+                        <button id="next-btn" aria-label="Next track" class="icon-btn text-gray-400 hover:text-emerald-500 transition text-xl md:text-2xl"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></button>
+                        <button id="repeat-btn" aria-label="Repeat off" title="Repeat off" class="icon-btn text-gray-400 hover:text-emerald-400"><svg class="icon" aria-hidden="true"><use href="#i-repeat"/></svg><span id="repeat-badge" class="hidden" aria-hidden="true">1</span></button>
+                    </div>
+                    <div id="secondary-controls">
+                        <button id="tracks-btn" aria-expanded="false" aria-controls="playlist-panel" class="md:hidden flex flex-col items-center text-emerald-500 text-xs font-bold tracking-widest uppercase p-1"><svg class="icon arrow-nudge mb-1" style="width:0.75rem;height:0.75rem" aria-hidden="true"><use href="#i-chevron-up"/></svg><span class="inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>Tracks</span></button>
+                        <div id="secondary-actions">
+                            <button id="install-btn" title="Add to Home Screen" aria-label="Add to Home Screen" class="hidden icon-btn text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/20"><svg class="icon" aria-hidden="true"><use href="#i-install"/></svg><span class="install-label text-[10px] font-bold uppercase tracking-wider leading-tight text-left">Add to Home Screen</span></button>
+                            <button id="shortcuts-btn" aria-label="Keyboard shortcuts" title="Keyboard shortcuts" class="icon-btn text-gray-400 hover:text-emerald-400">?</button>
+                            <button id="share-btn" aria-label="Share this track" title="Share track" class="icon-btn text-gray-400 hover:text-emerald-400"><svg class="icon" aria-hidden="true"><use href="#i-share"/></svg></button>
+                        </div>
+                        <div id="volume-row" class="hidden md:flex items-center gap-2 justify-end">
+                            <svg class="icon text-gray-400" aria-hidden="true"><use href="#i-volume"/></svg>
+                            <input type="range" id="volume-slider" aria-label="Volume" min="0" max="1" step="0.01" value="1" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Priority Lyrics (Desktop: 55% width) -->
+        <div id="lyrics-panel" class="w-full md:w-[55%] flex-1 min-h-0 md:flex-none md:h-full order-2 md:order-none md:border-l border-gray-700/50 md:pl-8 relative overflow-hidden md:shrink-0">
+            <div class="absolute top-0 left-0 w-full hidden h-16 md:h-32 bg-gradient-to-b from-[rgba(15,15,15,0.9)] to-transparent z-10 pointer-events-none"></div>
+            
+            <div id="lyrics-container" class="h-full overflow-y-auto py-24 md:py-48 space-y-6 md:space-y-8 text-center text-lg md:text-xl text-gray-400 font-medium custom-scrollbar">
+                <!-- Lyrics populate here automatically -->
+            </div>
+            
+            <div class="absolute bottom-0 left-0 w-full hidden h-16 md:h-32 bg-gradient-to-t from-[rgba(15,15,15,0.9)] to-transparent z-10 pointer-events-none"></div>
+        </div>
+
+    </div>
+
+    <!-- Hidden Audio Element -->
+    <div id="ios-tip" class="hidden fixed inset-x-4 bottom-6 z-50 rounded-2xl border border-emerald-500/40 bg-black/95 p-4 pr-10 text-center text-sm text-gray-200 shadow-2xl">
+        <button id="ios-tip-close" class="absolute top-2 right-3 icon-btn text-gray-400 text-xl" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+        <p class="font-bold text-emerald-400 mb-1">Add to Home Screen</p>
+        <p id="ios-tip-text"></p>
+    </div>
+    <audio id="audio-player" preload="metadata"></audio>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div id="shortcut-help" role="dialog" aria-modal="true" aria-labelledby="shortcut-title">
+        <div class="shortcut-card">
+            <h2 id="shortcut-title">Keyboard shortcuts</h2>
+            <div class="shortcut-list">
+                <div class="shortcut-row"><span>Play / pause</span><span class="shortcut-keys"><kbd>Space</kbd><kbd>K</kbd></span></div>
+                <div class="shortcut-row"><span>Seek 5 seconds</span><span class="shortcut-keys"><kbd>&larr;</kbd><kbd>&rarr;</kbd></span></div>
+                <div class="shortcut-row"><span>Previous / next track</span><span class="shortcut-keys"><kbd>Shift</kbd><kbd>&larr;</kbd><kbd>&rarr;</kbd></span></div>
+                <div class="shortcut-row"><span>Volume</span><span class="shortcut-keys"><kbd>&uarr;</kbd><kbd>&darr;</kbd></span></div>
+                <div class="shortcut-row"><span>Mute</span><span class="shortcut-keys"><kbd>M</kbd></span></div>
+                <div class="shortcut-row"><span>This help</span><span class="shortcut-keys"><kbd>?</kbd></span></div>
+            </div>
+            <button type="button" id="shortcut-close">Close</button>
+        </div>
+    </div>
+    
+    <!-- Load Playlist -->
+    <script src="playlist.js?v=4"></script>
+    <script src="remixes.js?v=2"></script>
+    
+    <script>
+        const audio = document.getElementById('audio-player');
+        const playBtn = document.getElementById('play-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const seekBar = document.getElementById('seek-bar');
+        const volumeSlider = document.getElementById('volume-slider');
+        const currentTimeEl = document.getElementById('current-time');
+        const totalTimeEl = document.getElementById('total-time');
+        const lyricsContainer = document.getElementById('lyrics-container');
+        const viewSwitch = document.getElementById('mobile-view-switch');
+        const viewSwitchButtons = viewSwitch.querySelectorAll('button[data-view]');
+        const mobileTitle = document.getElementById('song-title-mobile');
+        const mobileArtist = document.getElementById('song-artist-mobile');
+        const albumCover = document.getElementById('album-cover');
+        const albumBackdrop = document.getElementById('album-backdrop');
+        const playlistContainer = document.getElementById('playlist-container');
+        const offlineBadge = document.getElementById('offline-badge');
+        const searchInput = document.getElementById('track-search');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const repeatBtn = document.getElementById('repeat-btn');
+        const repeatBadge = document.getElementById('repeat-badge');
+        const shareBtn = document.getElementById('share-btn');
+        const toastEl = document.getElementById('toast');
+
+        // Must match the audio cache name in sw.js.
+        const AUDIO_CACHE_NAME = 'borderline-audio-v1';
+        let offlineTracks = new Set();
+        const downloadingTracks = new Set();
+        const failedTracks = new Set();
+        const downloadTimers = new Map();
+        const downloadWaiters = new Map();
+        // Fraction of a track the worker has streamed, keyed by absolute URL.
+        const trackProgress = new Map();
+        // Albums currently being downloaded track by track, so the button can
+        // keep its progress state even between two tracks.
+        const albumQueues = new Set();
+
+        function songUrl(song) {
+            const path = song.file.includes('/') ? song.file : 'music/' + song.file;
+            return new URL(path, document.baseURI).href;
+        }
+
+        function trackLabel(song, cached) {
+            return `${song.title}, ${song.artist}${cached ? ', available offline' : ''}`;
+        }
+
+        let currentSongIndex = 0;
+        let lyricsData = [];
+        let mobileView = 'lyrics';
+        // Set only when the listener picks a view, so every following track keeps it.
+        let viewChoice = null;
+
+        // Everything that should survive a reload lives here: last track and
+        // position per list, volume, mobile view, shuffle and repeat.
+        const PREFS_KEY = 'borderline-prefs-v1';
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const listPositions = {};
+        let activeList = '';
+        let activeAlbum = null;
+        let searchQuery = '';
+        let shuffleOn = false;
+        let repeatMode = 'off'; // 'off' | 'all' | 'one'
+        let shuffleOrder = [];
+        let qualityText = '';
+        let buffering = false;
+
+        function readPrefs() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
+                return parsed && typeof parsed === 'object' ? parsed : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        const savedPrefs = readPrefs();
+        viewChoice = savedPrefs.view === 'artwork' || savedPrefs.view === 'lyrics' ? savedPrefs.view : null;
+        shuffleOn = savedPrefs.shuffle === true;
+        repeatMode = savedPrefs.repeat === 'all' || savedPrefs.repeat === 'one' ? savedPrefs.repeat : 'off';
+        // playlist.js is the library; remixes.js groups it into the album cards.
+        // Both are read before window.myPlaylist is swapped to the active album.
+        const library = window.myPlaylist || [];
+        const albums = buildAlbums(library);
+        activeAlbum = albums[0] || null;
+        activeList = activeAlbum ? activeAlbum.id : '';
+
+        const savedPositions = savedPrefs.positions && typeof savedPrefs.positions === 'object' ? savedPrefs.positions : {};
+        albums.forEach(album => {
+            // Before albums existed, positions were stored under "songs".
+            const legacy = album.id === 'borderline' ? savedPositions.songs : undefined;
+            const value = savedPositions[album.id] != null ? savedPositions[album.id] : legacy;
+            listPositions[album.id] = Math.max(0, parseInt(value, 10) || 0);
+        });
+
+        let prefsTimer = 0;
+        let lastSavedSecond = 0;
+        function savePrefs(immediate) {
+            clearTimeout(prefsTimer);
+            const write = () => {
+                try {
+                    const song = (window.myPlaylist || [])[currentSongIndex] || {};
+                    localStorage.setItem(PREFS_KEY, JSON.stringify({
+                        list: activeList,
+                        positions: listPositions,
+                        track: slugify(song.title || ''),
+                        position: isFinite(audio.currentTime) ? Math.round(audio.currentTime) : 0,
+                        volume: audio.volume,
+                        view: viewChoice,
+                        shuffle: shuffleOn,
+                        repeat: repeatMode
+                    }));
+                } catch (error) {
+                    // Private mode or a full quota: remembering is a nicety.
+                }
+            };
+            if (immediate) write();
+            else prefsTimer = setTimeout(write, 250);
+        }
+
+        function slugify(text) {
+            return String(text).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        }
+
+        function iconUse(id, extraClass) {
+            return `<svg class="icon ${extraClass || ''}" aria-hidden="true"><use href="#${id}"/></svg>`;
+        }
+
+        function formatRuntime(seconds) {
+            const total = Math.round(seconds / 60);
+            if (total < 60) return `${total} min`;
+            const hours = Math.floor(total / 60);
+            const minutes = total % 60;
+            return minutes ? `${hours} hr ${minutes} min` : `${hours} hr`;
+        }
+
+        function formatSize(bytes) {
+            const megabytes = bytes / (1024 * 1024);
+            return megabytes >= 1 ? `${Math.round(megabytes)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        }
+
+        function buildShuffleOrder(startIndex, length) {
+            const rest = [];
+            for (let i = 0; i < length; i++) if (i !== startIndex) rest.push(i);
+            for (let i = rest.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [rest[i], rest[j]] = [rest[j], rest[i]];
+            }
+            return [startIndex, ...rest];
+        }
+
+        // Manual skips always move on; auto-advance honours repeat and can stop.
+        function nextIndex(auto) {
+            const length = (window.myPlaylist || []).length;
+            if (!length) return null;
+            if (auto && repeatMode === 'one') return currentSongIndex;
+
+            if (shuffleOn) {
+                if (shuffleOrder.length !== length) shuffleOrder = buildShuffleOrder(currentSongIndex, length);
+                const pos = shuffleOrder.indexOf(currentSongIndex);
+                // A track picked outside the cycle (a row click) gets a fresh one.
+                if (pos === -1) {
+                    shuffleOrder = buildShuffleOrder(currentSongIndex, length);
+                    return shuffleOrder[1] != null ? shuffleOrder[1] : shuffleOrder[0];
+                }
+                if (pos < shuffleOrder.length - 1) return shuffleOrder[pos + 1];
+                if (!auto || repeatMode === 'all') {
+                    shuffleOrder = buildShuffleOrder(currentSongIndex, length);
+                    return shuffleOrder[1] != null ? shuffleOrder[1] : shuffleOrder[0];
+                }
+                return null;
+            }
+
+            if (currentSongIndex + 1 < length) return currentSongIndex + 1;
+            if (!auto || repeatMode === 'all') return 0;
+            return null;
+        }
+
+        function prevIndex() {
+            const length = (window.myPlaylist || []).length;
+            if (!length) return 0;
+            if (shuffleOn) {
+                if (shuffleOrder.length !== length) shuffleOrder = buildShuffleOrder(currentSongIndex, length);
+                const pos = shuffleOrder.indexOf(currentSongIndex);
+                if (pos > 0) return shuffleOrder[pos - 1];
+                shuffleOrder = buildShuffleOrder(currentSongIndex, length);
+                return shuffleOrder[shuffleOrder.length - 1];
+            }
+            return (currentSongIndex - 1 + length) % length;
+        }
+
+        function renderModes() {
+            shuffleBtn.classList.toggle('is-on', shuffleOn);
+            shuffleBtn.setAttribute('aria-pressed', String(shuffleOn));
+            shuffleBtn.setAttribute('aria-label', shuffleOn ? 'Shuffle on' : 'Shuffle off');
+            repeatBtn.classList.toggle('is-on', repeatMode !== 'off');
+            repeatBadge.classList.toggle('hidden', repeatMode !== 'one');
+            repeatBtn.setAttribute('aria-label', repeatMode === 'one' ? 'Repeat one' : repeatMode === 'all' ? 'Repeat all' : 'Repeat off');
+            repeatBtn.setAttribute('title', repeatMode === 'one' ? 'Repeat one' : repeatMode === 'all' ? 'Repeat all' : 'Repeat off');
+            // Keep the existing shuffle cycle while a track change happens; only
+            // start a new one when shuffle is turned on or the list changes.
+            const length = (window.myPlaylist || []).length;
+            if (!shuffleOn) shuffleOrder = [];
+            else if (shuffleOrder.length !== length) shuffleOrder = buildShuffleOrder(currentSongIndex, length);
+        }
+
+        shuffleBtn.addEventListener('click', () => {
+            shuffleOn = !shuffleOn;
+            if (shuffleOn) shuffleOrder = buildShuffleOrder(currentSongIndex, (window.myPlaylist || []).length);
+            renderModes();
+            savePrefs();
+        });
+
+        repeatBtn.addEventListener('click', () => {
+            repeatMode = repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off';
+            renderModes();
+            savePrefs();
+        });
+
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value;
+            renderPlaylist();
+        });
+
+        // Media error recovery: a failed range request (an interrupted seek, a
+        // dropped connection) leaves an <audio> element permanently dead. Retry
+        // the same track where it stopped before declaring it unavailable.
+        const MAX_RECOVERY_ATTEMPTS = 2;
+        let recoveryAttempts = 0;
+        let lastKnownPosition = 0;
+        let recovering = false;
+        // Wrong to read audio.paused when recovering: an element reports itself as
+        // paused as soon as it fails. Track what the listener asked for instead.
+        let playbackWanted = false;
+
+        // Builds one track row. Search results reuse it, with the album name in
+        // the subtitle and a different selection callback.
+        function buildTrackRow(song, options) {
+            const url = songUrl(song);
+            const isActive = Boolean(options.isActive);
+
+            // Two real buttons per row - the track and its download control - so
+            // both are reachable with Tab and activate with Enter/Space.
+            const row = document.createElement('div');
+            row.className = `track-row w-full rounded-lg border transition-all duration-300 ${isActive ? 'is-active' : 'border-transparent hover:bg-gray-800/50'}`;
+            row.dataset.songUrl = url;
+            if (options.index != null) row.dataset.trackIndex = String(options.index);
+
+            row.innerHTML = `
+                <div class="flex items-center gap-1 p-1.5 md:p-1">
+                    <button type="button" data-play class="track-play min-w-0 flex-1 text-left cursor-pointer px-1.5 py-1 text-gray-400">
+                        <div class="font-bold text-sm md:text-xs truncate">${song.title}</div>
+                        <div class="text-xs md:text-[10px] truncate opacity-70 mt-0.5">${options.subtitle}</div>
+                    </button>
+                    <span class="track-duration shrink-0">${song.duration ? formatTime(song.duration) : ''}</span>
+                    <button type="button" data-download class="icon-btn shrink-0 text-xs"></button>
+                </div>
+            `;
+
+            const playButton = row.querySelector('[data-play]');
+            const downloadButton = row.querySelector('[data-download]');
+            playButton.setAttribute('aria-label', trackLabel(song, offlineTracks.has(url)));
+            if (isActive) playButton.setAttribute('aria-current', 'true');
+            markDownloadButton(downloadButton, song, downloadState(url));
+
+            row.onclick = event => {
+                if (event.target.closest('[data-download]')) return;
+                const wasKeyboard = event && event.detail === 0;
+                options.onSelect();
+                // The list is rebuilt by the selection, so restore focus when the
+                // panel is still visible; on a phone it closes instead.
+                const listVisible = !mobileTracks.matches || trackPanel.classList.contains('open');
+                if (wasKeyboard && listVisible && options.index != null) {
+                    const chosen = playlistContainer.querySelector(`[data-track-index="${options.index}"] [data-play]`);
+                    if (chosen) chosen.focus();
+                }
+            };
+
+            downloadButton.onclick = event => {
+                event.stopPropagation();
+                if (offlineTracks.has(url)) removeOffline(song);
+                else startDownload(song);
+            };
+
+            return row;
+        }
+
+        function appendEmptyNote(message) {
+            const empty = document.createElement('p');
+            empty.className = 'empty-note text-xs text-center py-6';
+            empty.textContent = message;
+            playlistContainer.appendChild(empty);
+        }
+
+        // With several albums, a search that only looked at the active list hid
+        // matches that were a tab away. The query now covers every album and the
+        // row's album name tells you where the track lives.
+        function renderSearchResults(query) {
+            const results = [];
+            albums.forEach(album => {
+                album.tracks.forEach((song, index) => {
+                    if (`${song.title} ${song.artist}`.toLowerCase().includes(query)) {
+                        results.push({ song, album, index });
+                    }
+                });
+            });
+
+            if (!results.length) {
+                appendEmptyNote('No tracks match.');
+                return;
+            }
+
+            const albumCount = new Set(results.map(result => result.album.id)).size;
+            const summary = document.createElement('p');
+            summary.className = 'search-summary';
+            summary.textContent = `${results.length} track${results.length === 1 ? '' : 's'} in ${albumCount} album${albumCount === 1 ? '' : 's'}`;
+            playlistContainer.appendChild(summary);
+
+            results.forEach(({ song, album, index }) => {
+                playlistContainer.appendChild(buildTrackRow(song, {
+                    index,
+                    isActive: album.id === activeList && index === currentSongIndex,
+                    subtitle: `${song.artist} \u00b7 ${album.title}`,
+                    onSelect: () => {
+                        closeTracks();
+                        setList(album.id, { index, play: true });
+                    }
+                }));
+            });
+        }
+
+        function renderPlaylist() {
+            playlistContainer.innerHTML = '';
+            const query = searchQuery.trim().toLowerCase();
+            if (query) {
+                renderSearchResults(query);
+                return;
+            }
+
+            const list = window.myPlaylist || [];
+            list.forEach((song, index) => {
+                playlistContainer.appendChild(buildTrackRow(song, {
+                    index,
+                    isActive: index === currentSongIndex,
+                    subtitle: song.artist,
+                    onSelect: () => {
+                        currentSongIndex = index;
+                        closeTracks();
+                        loadSong(currentSongIndex);
+                        playSong();
+                    }
+                }));
+            });
+        }
+
+        function downloadState(url) {
+            if (offlineTracks.has(url)) return 'cached';
+            if (downloadingTracks.has(url)) return 'downloading';
+            if (failedTracks.has(url)) return 'error';
+            return 'idle';
+        }
+
+        // The worker reports bytes as they arrive; only the ring changes, so the
+        // row is not rebuilt and focus stays where it is. Duplicate rows (search
+        // results) share the URL and both update.
+        function updateTrackProgress(url) {
+            const fraction = trackProgress.get(url);
+            if (fraction == null) return;
+            const percent = Math.max(0, Math.min(100, fraction * 100));
+            playlistContainer.querySelectorAll('[data-song-url]').forEach(row => {
+                if (row.dataset.songUrl !== url) return;
+                const badge = row.querySelector('[data-download]');
+                if (badge) badge.style.setProperty('--ring-progress', String(percent));
+            });
+        }
+
+        function markDownloadButton(button, song, state) {
+            const size = song.bytes ? ` (${formatSize(song.bytes)})` : '';
+            const states = {
+                idle: { icon: 'i-download', classes: 'download-idle', label: `Download ${song.title}${size} for offline listening` },
+                downloading: { icon: 'i-spinner', classes: 'download-active', label: `Downloading ${song.title}`, spin: true },
+                cached: { icon: 'i-check', classes: 'download-cached', label: `Remove ${song.title} from offline storage` },
+                error: { icon: 'i-alert', classes: '', label: `Download failed for ${song.title}` }
+            };
+            const info = states[state];
+            button.className = `icon-btn shrink-0 text-xs ${info.classes}`;
+            button.style.color = state === 'error' ? '#fbbf24' : '';
+            // aria-disabled keeps the control in the tab order, so focus survives
+            // the state change (a natively disabled button would drop it).
+            button.setAttribute('aria-disabled', String(state === 'downloading'));
+            button.setAttribute('aria-label', info.label);
+            button.title = info.label;
+            const ringPercent = state === 'downloading' ? (trackProgress.get(songUrl(song)) || 0) * 100 : state === 'cached' ? 100 : 0;
+            button.style.setProperty('--ring-progress', String(ringPercent));
+            button.innerHTML = iconUse(info.icon, info.spin ? 'spin' : '');
+        }
+
+        // Keeps the offline marks and download buttons in step with the audio cache
+        // without rebuilding the list (which would drop keyboard focus).
+        function syncOfflineMarkers() {
+            // Search rows can point at another album, so match by file URL rather
+            // than by the index in the active list.
+            const byUrl = new Map(knownTracks().map(song => [songUrl(song), song]));
+            playlistContainer.querySelectorAll('[data-song-url]').forEach(row => {
+                const url = row.dataset.songUrl;
+                const song = byUrl.get(url);
+                if (!song) return;
+                const play = row.querySelector('[data-play]');
+                const download = row.querySelector('[data-download]');
+                if (play) play.setAttribute('aria-label', trackLabel(song, offlineTracks.has(url)));
+                if (download) markDownloadButton(download, song, downloadState(url));
+            });
+            updateAlbumDownloadButton();
+        }
+
+        function clearDownloadTimer(url) {
+            const timer = downloadTimers.get(url);
+            if (timer) {
+                clearTimeout(timer);
+                downloadTimers.delete(url);
+            }
+        }
+
+        // Resolves the promise an album queue waits on. Individual downloads
+        // ignore it, so a finished track behaves exactly as before.
+        function finishDownloadWait(url, cached) {
+            const resolve = downloadWaiters.get(url);
+            if (!resolve) return;
+            downloadWaiters.delete(url);
+            resolve(cached);
+        }
+
+        async function startDownload(song) {
+            const url = songUrl(song);
+            if (offlineTracks.has(url)) return true;
+            if (downloadingTracks.has(url)) return false;
+
+            if (!('serviceWorker' in navigator)) {
+                failedTracks.add(url);
+                syncOfflineMarkers();
+                return false;
+            }
+
+            failedTracks.delete(url);
+            downloadingTracks.add(url);
+            trackProgress.delete(url);
+            syncOfflineMarkers();
+
+            // The queue resolves when the worker reports this URL, so the next
+            // track does not start while this one is still coming down.
+            const done = new Promise(resolve => downloadWaiters.set(url, resolve));
+
+            // Safety net for a worker that never answers (stalled network, update).
+            downloadTimers.set(url, setTimeout(() => {
+                if (offlineTracks.has(url)) {
+                    downloadTimers.delete(url);
+                    downloadingTracks.delete(url);
+                    syncOfflineMarkers();
+                    finishDownloadWait(url, true);
+                    return;
+                }
+                downloadTimers.delete(url);
+                downloadingTracks.delete(url);
+                failedTracks.add(url);
+                syncOfflineMarkers();
+                finishDownloadWait(url, false);
+            }, 180000));
+
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                const worker = navigator.serviceWorker.controller || registration.active;
+                if (!worker) throw new Error('No active service worker');
+                worker.postMessage({ type: 'download-track', url });
+            } catch (error) {
+                clearDownloadTimer(url);
+                downloadingTracks.delete(url);
+                failedTracks.add(url);
+                syncOfflineMarkers();
+                finishDownloadWait(url, false);
+            }
+
+            return done;
+        }
+
+        // Downloads the current album in order, one track at a time, so a phone
+        // is not asked to fetch a dozen tracks at once.
+        async function downloadAlbum(album) {
+            if (!album || !album.tracks.length || albumQueues.has(album.id)) return;
+            albumQueues.add(album.id);
+            updateAlbumDownloadButton();
+
+            try {
+                for (const song of album.tracks) {
+                    if (offlineTracks.has(songUrl(song))) continue;
+                    // A failed track is reported by its row; the rest still queue.
+                    await startDownload(song);
+                }
+            } finally {
+                albumQueues.delete(album.id);
+                syncOfflineMarkers();
+                updateAlbumDownloadButton();
+            }
+
+            const total = album.tracks.length;
+            const have = album.tracks.filter(song => offlineTracks.has(songUrl(song))).length;
+            if (have === total) showToast(`${album.title} is available offline`);
+            else if (have) showToast(`Saved ${have} of ${total} ${album.title} tracks`);
+            else showToast(`Could not download ${album.title}`);
+        }
+
+        // The album control mirrors a track row's download badge: download when
+        // anything is missing, spinner while the queue runs, check when complete.
+        function updateAlbumDownloadButton() {
+            const button = document.getElementById('album-download');
+            if (!button) return;
+            const base = 'icon-btn shrink-0 text-xs';
+            const album = activeAlbum;
+            const hide = () => {
+                button.hidden = true;
+                button.disabled = false;
+                button.className = `${base} download-idle`;
+                button.removeAttribute('aria-disabled');
+                button.setAttribute('aria-label', 'Download the current album for offline listening');
+                button.title = '';
+                button.style.setProperty('--ring-progress', '0');
+                button.innerHTML = iconUse('i-download');
+            };
+            if (!album || !('serviceWorker' in navigator) || !album.tracks.length) {
+                hide();
+                return;
+            }
+
+            const urls = album.tracks.map(songUrl);
+            const cached = urls.filter(url => offlineTracks.has(url)).length;
+            const missing = album.tracks.filter(song => !offlineTracks.has(songUrl(song)));
+
+            button.hidden = false;
+            if (albumQueues.has(album.id) || urls.some(url => downloadingTracks.has(url))) {
+                const label = `Downloading ${album.title}: ${cached} of ${urls.length} tracks offline`;
+                button.className = `${base} download-active`;
+                // aria-disabled keeps keyboard focus on the badge while it spins.
+                button.disabled = false;
+                button.setAttribute('aria-disabled', 'true');
+                button.setAttribute('aria-label', label);
+                button.title = label;
+                button.style.setProperty('--ring-progress', String(urls.length ? (cached / urls.length) * 100 : 0));
+                button.innerHTML = iconUse('i-spinner', 'spin');
+                return;
+            }
+
+            button.disabled = false;
+            button.removeAttribute('aria-disabled');
+            if (!missing.length) {
+                const label = `Remove ${album.title} from offline storage (${urls.length} track${urls.length === 1 ? '' : 's'})`;
+                button.className = `${base} download-cached`;
+                button.setAttribute('aria-label', label);
+                button.title = label;
+                button.style.setProperty('--ring-progress', '100');
+                button.innerHTML = iconUse('i-check');
+                return;
+            }
+
+            const bytes = missing.reduce((sum, song) => sum + (song.bytes || 0), 0);
+            const label = `Download ${album.title} for offline listening (${missing.length} track${missing.length === 1 ? '' : 's'}${bytes ? ', ' + formatSize(bytes) : ''})`;
+            button.className = `${base} download-idle`;
+            button.setAttribute('aria-label', label);
+            button.title = label;
+            button.style.setProperty('--ring-progress', '0');
+            button.innerHTML = iconUse('i-download');
+        }
+
+        async function refreshOfflineTracks() {
+            if (!('caches' in window)) return;
+            try {
+                if (await caches.has(AUDIO_CACHE_NAME)) {
+                    const cache = await caches.open(AUDIO_CACHE_NAME);
+                    const requests = await cache.keys();
+                    offlineTracks = new Set(requests.map(request => request.url));
+                } else {
+                    offlineTracks = new Set();
+                }
+            } catch (e) {
+                offlineTracks = new Set();
+            }
+            syncOfflineMarkers();
+            updateOfflineManager();
+        }
+
+        // The offline bar sums what the audio cache holds for tracks the playlists
+        // know about. It is the only place to remove one track or all of them.
+        function knownTracks() {
+            const seen = new Set();
+            const tracks = albums.length ? albums.flatMap(album => album.tracks) : library;
+            return tracks.filter(song => {
+                const url = songUrl(song);
+                if (seen.has(url)) return false;
+                seen.add(url);
+                return true;
+            });
+        }
+
+        function updateOfflineManager() {
+            const manager = document.getElementById('offline-manager');
+            const summary = document.getElementById('offline-summary');
+            const tracks = knownTracks();
+            const cached = tracks.filter(song => offlineTracks.has(songUrl(song)));
+            const known = new Set(tracks.map(song => songUrl(song)));
+            const stale = [...offlineTracks].filter(url => !known.has(url));
+
+            if (!cached.length && !stale.length) {
+                manager.classList.remove('visible');
+                summary.textContent = '';
+                summary.removeAttribute('title');
+                return;
+            }
+
+            const bytes = cached.reduce((total, song) => total + (song.bytes || 0), 0);
+            const count = `${cached.length} ${cached.length === 1 ? 'track' : 'tracks'}`;
+            if (cached.length) {
+                summary.textContent = `${count} offline${bytes ? ' \u00b7 ' + formatSize(bytes) : ''}`;
+            } else {
+                summary.textContent = 'Earlier downloads are still stored';
+            }
+            manager.classList.add('visible');
+
+            if (navigator.storage && navigator.storage.estimate) {
+                navigator.storage.estimate().then(({ usage }) => {
+                    if (usage) summary.title = `This app is using ${formatSize(usage)} of browser storage`;
+                }).catch(() => {});
+            }
+        }
+
+        async function removeOffline(song) {
+            const url = songUrl(song);
+            if (!offlineTracks.has(url)) return;
+            try {
+                const cache = await caches.open(AUDIO_CACHE_NAME);
+                await cache.delete(url);
+            } catch (error) {
+                // Private mode can block cache access; the marker still goes.
+            }
+            offlineTracks.delete(url);
+            syncOfflineMarkers();
+            updateOfflineManager();
+            showToast(`Removed ${song.title} from offline`);
+        }
+
+        // Mirrors a cached track badge: choosing the check removes the album.
+        async function removeAlbum(album) {
+            if (!album) return;
+            const urls = album.tracks.map(songUrl).filter(url => offlineTracks.has(url));
+            if (!urls.length) return;
+            try {
+                const cache = await caches.open(AUDIO_CACHE_NAME);
+                await Promise.all(urls.map(url => cache.delete(url)));
+            } catch (error) {
+                // Private mode can block cache access; the markers still go.
+            }
+            urls.forEach(url => offlineTracks.delete(url));
+            syncOfflineMarkers();
+            updateOfflineManager();
+            showToast(`Removed ${album.title} from offline`);
+        }
+
+        async function clearOfflineTracks() {
+            if (!offlineTracks.size) return;
+            try {
+                await caches.delete(AUDIO_CACHE_NAME);
+            } catch (error) {}
+            offlineTracks = new Set();
+            syncOfflineMarkers();
+            updateOfflineManager();
+            showToast('Offline tracks cleared');
+        }
+
+        document.getElementById('clear-offline').addEventListener('click', clearOfflineTracks);
+        document.getElementById('album-download').addEventListener('click', () => {
+            const album = activeAlbum;
+            if (!album || albumQueues.has(album.id)) return;
+            if (album.tracks.some(song => downloadingTracks.has(songUrl(song)))) return;
+            if (album.tracks.length && album.tracks.every(song => offlineTracks.has(songUrl(song)))) {
+                removeAlbum(album);
+            } else {
+                downloadAlbum(album);
+            }
+        });
+
+        function setSongLabels(title, artist) {
+            document.getElementById('song-title').innerText = title;
+            document.getElementById('song-artist').innerText = artist;
+            mobileTitle.innerText = title;
+            mobileArtist.innerText = artist;
+        }
+
+        // The square cover sits on a blurred copy of itself inside the tall frame.
+        // A track with its own art keeps it; otherwise the album's cover is used.
+        function showArtwork(song) {
+            const art = song.art || (activeAlbum && activeAlbum.art) || 'cover1.webp';
+            const artUrl = new URL(art, document.baseURI).href;
+            if (albumCover.src !== artUrl) {
+                albumCover.src = artUrl;
+                albumBackdrop.src = artUrl;
+            }
+            albumCover.alt = `${song.title} by ${song.artist} album artwork`;
+        }
+
+        // A track artwork that cannot be loaded (offline before it was cached)
+        // falls back to the album cover instead of a broken image.
+        albumCover.addEventListener('error', () => {
+            if (albumCover.src.endsWith('/cover1.webp')) return;
+            albumCover.src = 'cover1.webp';
+            albumBackdrop.src = 'cover1.webp';
+        });
+
+        function activeLyricIndex() {
+            let activeIndex = -1;
+            for (let i = 0; i < lyricsData.length; i++) {
+                if (audio.currentTime >= lyricsData[i].time) activeIndex = i;
+                else break;
+            }
+            return activeIndex;
+        }
+
+        function syncActiveLyric(behavior) {
+            const activeIndex = activeLyricIndex();
+            if (activeIndex === -1) return;
+
+            document.querySelectorAll('.lyric-line').forEach(el => {
+                el.classList.remove('lyric-active');
+                el.removeAttribute('aria-current');
+            });
+            const activeEl = document.getElementById(`lyric-${activeIndex}`);
+            if (!activeEl) return;
+            activeEl.classList.add('lyric-active');
+            activeEl.setAttribute('aria-current', 'true');
+
+            const containerCenter = lyricsContainer.clientHeight / 2;
+            const elOffset = activeEl.offsetTop - lyricsContainer.offsetTop;
+            lyricsContainer.scrollTo({
+                top: elOffset - containerCenter + (activeEl.clientHeight / 2),
+                behavior: reduceMotion.matches ? 'auto' : behavior
+            });
+        }
+
+        // Phones show one of the two at a time; desktop keeps both side by side.
+        function setMobileView(view) {
+            mobileView = view === 'artwork' ? 'artwork' : 'lyrics';
+            document.body.classList.toggle('artwork-view', mobileView === 'artwork');
+            document.body.classList.toggle('lyrics-view', mobileView === 'lyrics');
+            viewSwitchButtons.forEach(button => {
+                button.setAttribute('aria-pressed', String(button.dataset.view === mobileView));
+            });
+            // The lyrics panel was hidden, so re-measure before centring the line.
+            if (mobileView === 'lyrics' && lyricsData.length) {
+                requestAnimationFrame(() => syncActiveLyric('auto'));
+            }
+        }
+
+        viewSwitch.addEventListener('click', event => {
+            const button = event.target.closest('button[data-view]');
+            if (!button) return;
+            viewChoice = button.dataset.view;
+            setMobileView(viewChoice);
+            savePrefs();
+        });
+
+        function loadSong(index, options) {
+            const opts = options || {};
+            const song = window.myPlaylist[index];
+            if (!song) return;
+            currentSongIndex = index;
+            listPositions[activeList] = index;
+
+            const audioPath = song.file.includes('/') ? song.file : 'music/' + song.file;
+            audio.src = audioPath;
+            setSongLabels(song.title, song.artist);
+            showArtwork(song);
+
+            // Reset the transport so a new track never shows the previous track's values.
+            recoveryAttempts = 0;
+            recovering = false;
+            lastKnownPosition = 0;
+            currentTimeEl.innerText = '0:00';
+            totalTimeEl.innerText = '0:00';
+            seekBar.value = 0;
+            qualityText = '';
+            buffering = false;
+            lastPositionUpdate = -1;
+            setQualityBadge('');
+            updateMediaSession(song);
+
+            // Restoring a session resumes at the saved second once the file's
+            // metadata (and therefore its duration) is known.
+            if (opts.startAt > 0) {
+                const seekToSaved = () => {
+                    audio.removeEventListener('loadedmetadata', seekToSaved);
+                    const target = Number(opts.startAt);
+                    if (!isFinite(target) || target <= 0 || !isFinite(audio.duration) || target >= audio.duration - 2) return;
+                    try {
+                        audio.currentTime = target;
+                        lastKnownPosition = target;
+                        seekBar.value = (target / audio.duration) * 100;
+                        currentTimeEl.innerText = formatTime(target);
+                    } catch (error) {}
+                };
+                audio.addEventListener('loadedmetadata', seekToSaved);
+            }
+
+            lyricsData = song.lyrics || [];
+            lyricsContainer.innerHTML = '';
+
+            if (lyricsData.length === 0) {
+                lyricsContainer.innerHTML = '<p class="empty-note mt-10 md:mt-20">No lyrics available.</p>';
+            } else {
+                lyricsData.forEach((line, i) => {
+                    const p = document.createElement('button');
+                    p.type = 'button';
+                    p.textContent = line.text;
+                    p.className = 'lyric-line hover:text-gray-200';
+                    p.id = `lyric-${i}`;
+                    p.onclick = () => {
+                        audio.currentTime = line.time;
+                        if(audio.paused) playSong();
+                    };
+                    lyricsContainer.appendChild(p);
+                });
+            }
+
+            // Keep whatever view the listener last picked; otherwise use the
+            // sensible default (lyrics for vocals, artwork when there is nothing).
+            setMobileView(viewChoice || (lyricsData.length ? 'lyrics' : 'artwork'));
+
+            renderModes();
+            renderPlaylist();
+            // A restored session keeps the saved second until playback moves it.
+            if (!(opts.startAt > 0)) savePrefs();
+        }
+
+        const mediaSessionSupported = 'mediaSession' in navigator && typeof MediaMetadata === 'function';
+
+        function syncPlayIcon() {
+            // Drives the pulsing glow behind the artwork.
+            document.body.classList.toggle('is-playing', !audio.paused);
+            playBtn.innerHTML = audio.paused
+                ? '<svg class="icon" style="margin-left:2px" aria-hidden="true"><use href="#i-play"/></svg>'
+                : '<svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg>';
+            playBtn.setAttribute('aria-label', audio.paused ? 'Play' : 'Pause');
+            if (mediaSessionSupported) {
+                navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
+            }
+        }
+
+        // The icon follows the element itself, so pausing from the lock screen,
+        // headphones or another tab can no longer leave the button out of sync.
+        audio.addEventListener('play', syncPlayIcon);
+        audio.addEventListener('pause', () => {
+            syncPlayIcon();
+            savePrefs();
+        });
+
+        function playSong() {
+            playbackWanted = true;
+            // play() rejects when playback is blocked or the file is unusable; without
+            // this the button could sit on "pause" while nothing is playing.
+            audio.play().catch(() => syncPlayIcon());
+        }
+
+        function pauseSong() {
+            playbackWanted = false;
+            audio.pause();
+        }
+
+        // The OS picks a rendition from the declared pixel size, so read each
+        // cover once instead of guessing (the files are 1000 or 1024 px squares).
+        const mediaArtworkSizes = new Map();
+
+        function updateMediaSession(song) {
+            if (!mediaSessionSupported) return;
+            try {
+                const artUrl = new URL(song.art || (activeAlbum && activeAlbum.art) || 'cover1.webp', document.baseURI).href;
+                const knownSize = mediaArtworkSizes.get(artUrl);
+                const artwork = [{ src: artUrl, type: /\.png$/i.test(artUrl) ? 'image/png' : /\.webp$/i.test(artUrl) ? 'image/webp' : 'image/jpeg' }];
+                if (knownSize) artwork[0].sizes = knownSize;
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: song.title,
+                    artist: song.artist,
+                    album: activeAlbum ? activeAlbum.title : 'Borderline',
+                    artwork
+                });
+                navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
+                if (!knownSize) {
+                    const probe = new Image();
+                    probe.onload = () => {
+                        mediaArtworkSizes.set(artUrl, `${probe.naturalWidth}x${probe.naturalHeight}`);
+                        const current = (window.myPlaylist || [])[currentSongIndex];
+                        const currentArt = current && new URL(current.art || (activeAlbum && activeAlbum.art) || 'cover1.webp', document.baseURI).href;
+                        if (currentArt === artUrl) updateMediaSession(current);
+                    };
+                    probe.src = artUrl;
+                }
+            } catch (e) {}
+        }
+
+        // Keeps the lock-screen scrubber in step with playback.
+        let lastPositionUpdate = -1;
+        function updatePositionState() {
+            if (!mediaSessionSupported || typeof navigator.mediaSession.setPositionState !== 'function') return;
+            if (!isFinite(audio.duration) || audio.duration <= 0) return;
+            const second = Math.floor(audio.currentTime);
+            if (second === lastPositionUpdate) return;
+            lastPositionUpdate = second;
+            try {
+                navigator.mediaSession.setPositionState({
+                    duration: audio.duration,
+                    playbackRate: audio.playbackRate || 1,
+                    position: Math.min(Math.max(audio.currentTime, 0), audio.duration)
+                });
+            } catch (error) {}
+        }
+
+        // Seeking or pausing does not always produce a timeupdate at the new spot,
+        // which left the lock-screen scrubber a second behind.
+        ['loadedmetadata', 'seeked', 'pause', 'ratechange', 'durationchange'].forEach(event => {
+            audio.addEventListener(event, updatePositionState);
+        });
+
+        // Shared by the OS seek/scrub actions; returns to the element even when
+        // duration is not known yet, and keeps the saved session in step.
+        function mediaSeek(position, fast) {
+            if (!isFinite(position)) return;
+            const limit = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : position;
+            const target = Math.min(Math.max(position, 0), limit);
+            lastKnownPosition = target;
+            lastPositionUpdate = -1;
+            try {
+                if (fast && typeof audio.fastSeek === 'function') audio.fastSeek(target);
+                else audio.currentTime = target;
+            } catch (error) {
+                try { audio.currentTime = target; } catch (e) {}
+            }
+            updatePositionState();
+        }
+
+        function skipBy(seconds) {
+            if (!isFinite(audio.duration)) return;
+            mediaSeek(audio.currentTime + seconds, false);
+        }
+
+        function stopFromMediaSession() {
+            pauseSong();
+            mediaSeek(0, false);
+        }
+
+        // Hardware keys restart a track that has been playing for a while; a
+        // second press then moves to the previous track.
+        function previousFromMediaSession() {
+            if (audio.currentTime > 3) {
+                mediaSeek(0, false);
+                return;
+            }
+            loadSong(prevIndex());
+            playSong();
+        }
+
+        if (mediaSessionSupported) {
+            const sessionHandlers = {
+                play: () => playSong(),
+                pause: () => pauseSong(),
+                stop: stopFromMediaSession,
+                previoustrack: previousFromMediaSession,
+                nexttrack: () => nextBtn.click(),
+                // No offset is supplied by most lock screens; match the arrow keys.
+                seekbackward: details => skipBy(-(details.seekOffset || 5)),
+                seekforward: details => skipBy(details.seekOffset || 5),
+                seekto: details => {
+                    if (typeof details.seekTime !== 'number') return;
+                    mediaSeek(details.seekTime, Boolean(details.fastSeek));
+                }
+            };
+            Object.keys(sessionHandlers).forEach(action => {
+                try { navigator.mediaSession.setActionHandler(action, sessionHandlers[action]); } catch (e) {}
+            });
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) playSong();
+            else pauseSong();
+        });
+
+        function playNext(auto) {
+            const index = nextIndex(auto);
+            if (index == null) {
+                // End of the list with repeat off.
+                playbackWanted = false;
+                syncPlayIcon();
+                return;
+            }
+            loadSong(index);
+            playSong();
+        }
+
+        prevBtn.addEventListener('click', () => {
+            loadSong(prevIndex());
+            playSong();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            playNext(false);
+        });
+
+        // Reloads the current source at the last known position. Returns false
+        // when this track has already used up its attempts.
+        function recoverPlayback() {
+            if (recovering || recoveryAttempts >= MAX_RECOVERY_ATTEMPTS) return false;
+
+            recoveryAttempts += 1;
+            recovering = true;
+            const position = lastKnownPosition;
+            const shouldResume = playbackWanted;
+            if (recoveryAttempts === 1) setQualityBadge('Reconnecting', false);
+
+            setTimeout(() => {
+                const resume = () => {
+                    audio.removeEventListener('loadedmetadata', resume);
+                    recovering = false;
+                    try {
+                        if (position > 0 && isFinite(audio.duration) && position < audio.duration) {
+                            audio.currentTime = position;
+                        }
+                    } catch (e) {}
+                    if (shouldResume) playSong();
+                };
+                audio.addEventListener('loadedmetadata', resume);
+                // A fresh URL, not just load(): once a media element has failed, its
+                // data source stays broken for that resource. The service worker
+                // strips the query, so this is the same cached track.
+                audio.src = (audio.src.split('?')[0]) + '?recover=' + recoveryAttempts;
+                audio.load();
+            }, 250 * recoveryAttempts);
+
+            return true;
+        }
+
+        audio.addEventListener('playing', () => {
+            recoveryAttempts = 0;
+            recovering = false;
+        });
+
+        // Remember a seek target immediately, before any timeupdate reports it, so
+        // a failure during a seek resumes where the listener asked to be.
+        audio.addEventListener('seeking', () => {
+            if (isFinite(audio.currentTime)) lastKnownPosition = audio.currentTime;
+        });
+
+        audio.addEventListener('error', () => {
+            if (recoverPlayback()) {
+                console.warn('Audio error, retrying at', Math.round(lastKnownPosition), 's:', audio.currentSrc || audio.src);
+                return;
+            }
+            // Out of retries: report it once and leave next/prev working.
+            setQualityBadge('Unavailable', true);
+            syncPlayIcon();
+            console.warn('Audio failed to load:', audio.currentSrc || audio.src);
+        });
+
+        audio.addEventListener('ended', () => {
+            if (repeatMode === 'one') {
+                audio.currentTime = 0;
+                playSong();
+                return;
+            }
+            playbackWanted = true;
+            playNext(true);
+        });
+
+        const qualityBadge = document.getElementById('quality-badge');
+
+        function setQualityBadge(text, isError) {
+            qualityBadge.textContent = text;
+            qualityBadge.style.color = isError ? '#f87171' : '';
+        }
+
+        function showQuality() {
+            const src = audio.currentSrc || audio.src;
+            const ext = src.split('?')[0].split('.').pop().toLowerCase();
+            const lossless = ['flac', 'wav', 'aiff', 'aif', 'alac'].includes(ext);
+            qualityText = ext.toUpperCase() + (lossless ? ' \u00b7 Lossless' : '');
+            if (!buffering) setQualityBadge(qualityText);
+            if (!lossless && isFinite(audio.duration) && audio.duration > 0) {
+                fetch(src, { method: 'HEAD' }).then(r => {
+                    const bytes = parseInt(r.headers.get('content-length'), 10);
+                    if (bytes && src === (audio.currentSrc || audio.src)) {
+                        // Tag and artwork bytes inflate a size-based estimate, so snap
+                        // to a standard MP3 rate when the difference is small.
+                        const raw = bytes * 8 / audio.duration / 1000;
+                        const rates = [32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
+                        const nearest = rates.reduce((best, rate) => Math.abs(rate - raw) < Math.abs(best - raw) ? rate : best, rates[0]);
+                        const kbps = Math.abs(nearest - raw) / nearest <= 0.08 ? nearest : Math.round(raw);
+                        qualityText = ext.toUpperCase() + ' \u00b7 ~' + kbps + ' kbps';
+                        if (!buffering) setQualityBadge(qualityText);
+                    }
+                }).catch(() => {});
+            }
+        }
+
+        // A stalling track used to look identical to a broken one; say when it is
+        // waiting for bytes instead of leaving the play button silent.
+        audio.addEventListener('waiting', () => {
+            if (audio.paused) return;
+            buffering = true;
+            setQualityBadge('Buffering\u2026');
+        });
+        audio.addEventListener('playing', () => {
+            if (!buffering) return;
+            buffering = false;
+            setQualityBadge(qualityText);
+        });
+        audio.addEventListener('canplay', () => {
+            if (!buffering) return;
+            buffering = false;
+            setQualityBadge(qualityText);
+        });
+
+        function formatTime(seconds) {
+            // Infinity shows up for some streams and would render "Infinity:NaN".
+            if (!isFinite(seconds)) return "0:00";
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        audio.addEventListener('loadedmetadata', () => {
+            totalTimeEl.innerText = formatTime(audio.duration);
+            showQuality();
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            if (isFinite(audio.currentTime)) lastKnownPosition = audio.currentTime;
+            if (isFinite(audio.duration) && audio.duration > 0) {
+                seekBar.value = (audio.currentTime / audio.duration) * 100;
+                currentTimeEl.innerText = formatTime(audio.currentTime);
+            }
+
+            updatePositionState();
+            const wholeSecond = Math.floor(audio.currentTime);
+            if (wholeSecond - lastSavedSecond >= 5) {
+                lastSavedSecond = wholeSecond;
+                savePrefs();
+            }
+
+            const lyricsHidden = mobileView === 'artwork' && window.matchMedia('(max-width: 767.98px)').matches;
+            if (!lyricsHidden && lyricsData.length) {
+                const activeIndex = activeLyricIndex();
+                const current = lyricsContainer.querySelector('.lyric-active');
+                if (activeIndex !== -1 && (!current || current.id !== `lyric-${activeIndex}`)) {
+                    syncActiveLyric('smooth');
+                }
+            }
+        });
+
+        seekBar.addEventListener('input', () => {
+            if (isFinite(audio.duration) && audio.duration > 0) {
+                audio.currentTime = (seekBar.value / 100) * audio.duration;
+            }
+        });
+
+        // iOS ignores programmatic audio.volume, so the slider would be a dead control.
+        const volumeSupported = (() => {
+            try {
+                const probe = document.createElement('audio');
+                probe.volume = 0.5;
+                return Math.abs(probe.volume - 0.5) < 0.01;
+            } catch (e) {
+                return false;
+            }
+        })();
+        if (!volumeSupported) document.getElementById('volume-row').style.display = 'none';
+
+        if (typeof savedPrefs.volume === 'number' && isFinite(savedPrefs.volume)) {
+            const restoredVolume = Math.min(Math.max(savedPrefs.volume, 0), 1);
+            if (volumeSupported) {
+                try { audio.volume = restoredVolume; } catch (error) {}
+            }
+            volumeSlider.value = restoredVolume;
+        }
+
+        volumeSlider.addEventListener('input', () => {
+            audio.volume = volumeSlider.value;
+            savePrefs();
+        });
+
+        function seekBy(seconds) {
+            if (!isFinite(audio.duration) || audio.duration <= 0) return;
+            audio.currentTime = Math.min(Math.max(audio.currentTime + seconds, 0), audio.duration);
+        }
+
+        function setVolume(value) {
+            if (!volumeSupported) return;
+            const next = Math.min(Math.max(value, 0), 1);
+            audio.volume = next;
+            volumeSlider.value = next;
+        }
+
+        // Keyboard: Space/K play-pause, Left/Right seek 5s, Shift+Left/Right change
+        // track, Up/Down volume, M mute. Keys aimed at a control are left alone.
+        document.addEventListener('keydown', event => {
+            if (event.altKey || event.ctrlKey || event.metaKey) return;
+            const typing = event.target.closest && event.target.closest('input, textarea, select, [contenteditable="true"]');
+            // Help is available from anywhere except a text field, even when a
+            // button has focus, which the transport guard below ignores.
+            if (event.key === '?' && !typing) {
+                event.preventDefault();
+                openShortcuts();
+                return;
+            }
+            if (event.target.closest && event.target.closest('input, textarea, select, button, a, [contenteditable="true"]')) return;
+
+            if (event.key === 'Escape') {
+                if (shortcutHelp.classList.contains('open')) closeShortcuts();
+                return;
+            }
+
+            switch (event.key) {
+                case ' ':
+                case 'k':
+                case 'K':
+                    event.preventDefault();
+                    if (audio.paused) playSong();
+                    else pauseSong();
+                    break;
+                case 'ArrowRight':
+                    event.preventDefault();
+                    if (event.shiftKey) nextBtn.click();
+                    else seekBy(5);
+                    break;
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    if (event.shiftKey) prevBtn.click();
+                    else seekBy(-5);
+                    break;
+                case 'ArrowUp':
+                    event.preventDefault();
+                    setVolume(audio.volume + 0.05);
+                    break;
+                case 'ArrowDown':
+                    event.preventDefault();
+                    setVolume(audio.volume - 0.05);
+                    break;
+                case 'm':
+                case 'M':
+                    event.preventDefault();
+                    audio.muted = !audio.muted;
+                    break;
+            }
+        });
+
+        const installBtn = document.getElementById('install-btn');
+        const iosTip = document.getElementById('ios-tip');
+        const ua = navigator.userAgent;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const inApp = /FBAN|FBAV|Instagram|Line\//.test(ua);
+        let deferredPrompt = null;
+        if ('serviceWorker' in navigator) {
+            // The service worker reports tracks it finished caching, or failed to.
+            navigator.serviceWorker.addEventListener('message', event => {
+                const data = event.data;
+                if (!data || !data.url) return;
+
+                if (data.type === 'audio-progress') {
+                    trackProgress.set(data.url, Number(data.fraction) || 0);
+                    updateTrackProgress(data.url);
+                } else if (data.type === 'audio-cached') {
+                    offlineTracks.add(data.url);
+                    downloadingTracks.delete(data.url);
+                    failedTracks.delete(data.url);
+                    trackProgress.delete(data.url);
+                    clearDownloadTimer(data.url);
+                    syncOfflineMarkers();
+                    updateOfflineManager();
+                    finishDownloadWait(data.url, true);
+                } else if (data.type === 'audio-cache-failed') {
+                    clearDownloadTimer(data.url);
+                    downloadingTracks.delete(data.url);
+                    trackProgress.delete(data.url);
+                    failedTracks.add(data.url);
+                    syncOfflineMarkers();
+                    finishDownloadWait(data.url, false);
+                    setTimeout(() => {
+                        failedTracks.delete(data.url);
+                        syncOfflineMarkers();
+                    }, 6000);
+                }
+            });
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
+        function updateConnectivity() {
+            const offline = navigator.onLine === false;
+            offlineBadge.classList.toggle('hidden', !offline);
+            offlineBadge.classList.toggle('inline-flex', offline);
+        }
+        window.addEventListener('online', updateConnectivity);
+        window.addEventListener('offline', updateConnectivity);
+        updateConnectivity();
+        refreshOfflineTracks();
+
+        // Install state. The button must stay gone once the app is installed, even if
+        // the site is later opened in an ordinary browser tab on the same device.
+        const INSTALLED_KEY = 'borderline-installed';
+        function readInstalledFlag() {
+            try { return localStorage.getItem(INSTALLED_KEY) === '1'; } catch (e) { return false; }
+        }
+        function setInstalledFlag(value) {
+            try {
+                if (value) localStorage.setItem(INSTALLED_KEY, '1');
+                else localStorage.removeItem(INSTALLED_KEY);
+            } catch (e) { /* private mode: fall back to in-memory state */ }
+        }
+        function hideInstallButton() {
+            installBtn.classList.add('hidden');
+            iosTip.classList.add('hidden');
+        }
+
+        // Starting in standalone mode is proof this device has the app installed.
+        let isInstalled = isStandalone || readInstalledFlag();
+        if (isStandalone) setInstalledFlag(true);
+        if (isInstalled) hideInstallButton();
+
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Chromium only offers this prompt when the app is not installed, so a
+            // fresh prompt also brings the button back after an uninstall.
+            isInstalled = false;
+            setInstalledFlag(false);
+            installBtn.classList.remove('hidden');
+        });
+        window.addEventListener('appinstalled', () => {
+            isInstalled = true;
+            deferredPrompt = null;
+            setInstalledFlag(true);
+            hideInstallButton();
+        });
+        if (!isInstalled && (isIOS || inApp)) installBtn.classList.remove('hidden');
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt && !inApp) {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                // Keep the button on dismiss; 'appinstalled' hides it for good.
+                deferredPrompt = null;
+                return;
+            }
+            document.getElementById('ios-tip-text').innerHTML = inApp
+                ? 'Open this page in your phone\'s browser first (tap the menu, then <b>Open in Browser</b>), then add it to your Home Screen.'
+                : isIOS
+                    ? 'Tap the <svg class="icon" style="margin:0 0.25rem" aria-hidden="true"><use href="#i-share"/></svg> Share button, then choose <b>Add to Home Screen</b>.'
+                    : 'Open your browser menu and choose <b>Install app</b> or <b>Add to Home Screen</b>.';
+            iosTip.classList.remove('hidden');
+        });
+        document.getElementById('ios-tip-close').addEventListener('click', () => iosTip.classList.add('hidden'));
+
+        // Track links: ?album=<id>&track=<slug> opens that song in its album.
+        // The album is optional, so older ?track= links still resolve.
+        function findTrackBySlug(trackSlug, albumId) {
+            if (!trackSlug) return null;
+            const wanted = String(trackSlug).toLowerCase();
+            const preferred = albumId ? albumById(albumId) : null;
+            const order = preferred ? [preferred, ...albums.filter(album => album !== preferred)] : albums;
+            for (const album of order) {
+                const index = album.tracks.findIndex(song => slugify(song.title) === wanted);
+                if (index > -1) return { album: album.id, index };
+            }
+            return null;
+        }
+
+        function trackUrl(song) {
+            const url = new URL(location.href);
+            url.hash = '';
+            const params = new URLSearchParams();
+            if (activeList) params.set('album', activeList);
+            params.set('track', slugify(song.title));
+            url.search = '?' + params.toString();
+            return url.href;
+        }
+
+        function copyText(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+            }
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.select();
+            let copied = false;
+            try { copied = document.execCommand('copy'); } catch (error) {}
+            area.remove();
+            return copied ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+        }
+
+        let toastTimer = 0;
+        function showToast(message) {
+            toastEl.textContent = message;
+            toastEl.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+        }
+
+        async function shareCurrentTrack() {
+            const song = (window.myPlaylist || [])[currentSongIndex];
+            if (!song) return;
+            const url = trackUrl(song);
+            const shareData = {
+                title: `${song.title} \u2014 Borderline Project`,
+                text: `Listen to \u201c${song.title}\u201d by Borderline`,
+                url
+            };
+
+            if (!navigator.share) {
+                try {
+                    await copyText(url);
+                    showToast('Link copied');
+                } catch (error) {
+                    showToast('Could not copy link');
+                }
+                return;
+            }
+
+            try {
+                await navigator.share(shareData);
+            } catch (error) {
+                // Dismissing the share sheet is not a failure.
+                if (error && error.name === 'AbortError') return;
+                try {
+                    await copyText(url);
+                    showToast('Link copied');
+                } catch (copyError) {
+                    showToast('Could not copy link');
+                }
+            }
+        }
+
+        shareBtn.addEventListener('click', shareCurrentTrack);
+
+        const trackPanel = document.getElementById('playlist-panel');
+        const tracksBtn = document.getElementById('tracks-btn');
+        const closeTracksBtn = document.getElementById('close-tracks');
+        const mobileTracks = window.matchMedia('(max-width: 767.98px)');
+
+        function closeTracks(options) {
+            if (!trackPanel.classList.contains('open')) return;
+            const hadFocus = trackPanel.contains(document.activeElement);
+            trackPanel.classList.remove('open');
+            tracksBtn.setAttribute('aria-expanded', 'false');
+            // The sheet covers the page on a phone, so hand focus back to the
+            // control that opened it. Desktop keeps the panel visible and leaves
+            // focus where the listener put it.
+            if (mobileTracks.matches && ((options && options.restoreFocus) || hadFocus)) {
+                tracksBtn.focus({ preventScroll: true });
+            }
+        }
+
+        function openTracks() {
+            trackPanel.classList.add('open');
+            tracksBtn.setAttribute('aria-expanded', 'true');
+            closeTracksBtn.focus({ preventScroll: true });
+        }
+
+        tracksBtn.addEventListener('click', () => {
+            if (trackPanel.classList.contains('open')) closeTracks({ restoreFocus: true });
+            else openTracks();
+        });
+        closeTracksBtn.addEventListener('click', () => closeTracks({ restoreFocus: true }));
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape' || !trackPanel.classList.contains('open')) return;
+            event.preventDefault();
+            closeTracks({ restoreFocus: true });
+        });
+
+        const shortcutHelp = document.getElementById('shortcut-help');
+        const shortcutClose = document.getElementById('shortcut-close');
+        const shortcutsBtn = document.getElementById('shortcuts-btn');
+        let shortcutReturnFocus = null;
+
+        function openShortcuts() {
+            shortcutReturnFocus = document.activeElement;
+            shortcutHelp.classList.add('open');
+            shortcutClose.focus({ preventScroll: true });
+        }
+
+        function closeShortcuts() {
+            if (!shortcutHelp.classList.contains('open')) return;
+            shortcutHelp.classList.remove('open');
+            if (shortcutReturnFocus && typeof shortcutReturnFocus.focus === 'function') {
+                shortcutReturnFocus.focus({ preventScroll: true });
+            }
+            shortcutReturnFocus = null;
+        }
+
+        shortcutsBtn.addEventListener('click', openShortcuts);
+        shortcutClose.addEventListener('click', closeShortcuts);
+        shortcutHelp.addEventListener('click', event => {
+            if (event.target === shortcutHelp) closeShortcuts();
+        });
+        // The dialog has a single control, so keep Tab inside it.
+        shortcutHelp.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closeShortcuts();
+            } else if (event.key === 'Tab') {
+                event.preventDefault();
+                shortcutClose.focus();
+            }
+        });
+
+        const listTabs = document.getElementById('list-tabs');
+
+        function normalizeTrackFile(file) {
+            return String(file || '')
+                .replace(/\\/g, '/')
+                .replace(/^\.?\//, '')
+                .replace(/^music\//i, '')
+                .toLowerCase();
+        }
+
+        // Turns the album definitions in remixes.js into playable lists. Album
+        // entries can be playlist file names or full track objects; unknown
+        // files are skipped with a warning instead of breaking the switcher.
+        function buildAlbums(libraryTracks) {
+            const master = Array.isArray(libraryTracks) ? libraryTracks : [];
+            const byFile = new Map();
+            master.forEach(song => {
+                if (!song || !song.file) return;
+                const key = normalizeTrackFile(song.file);
+                if (!byFile.has(key)) byFile.set(key, song);
+            });
+
+            const configs = Array.isArray(window.myAlbums) ? window.myAlbums : [];
+            const built = [];
+            const ids = new Set();
+
+            configs.forEach((config, index) => {
+                if (!config || typeof config !== 'object') return;
+                const title = String(config.title || '').trim();
+                const id = String(config.id || slugify(title) || `album-${index + 1}`).trim();
+                if (!id || ids.has(id)) {
+                    console.warn('Albums: duplicate or missing id, skipped:', config);
+                    return;
+                }
+                ids.add(id);
+
+                const seen = new Set();
+                const tracks = (Array.isArray(config.tracks) ? config.tracks : []).map(entry => {
+                    let song = null;
+                    if (typeof entry === 'string') {
+                        song = byFile.get(normalizeTrackFile(entry)) || null;
+                    } else if (entry && typeof entry === 'object' && entry.file) {
+                        song = { artist: 'Borderline', ...entry };
+                    }
+                    if (!song || !song.title) {
+                        console.warn(`Album "${title || id}" skips an unknown track:`, entry);
+                        return null;
+                    }
+                    const key = normalizeTrackFile(song.file);
+                    if (seen.has(key)) return null;
+                    seen.add(key);
+                    return song;
+                }).filter(Boolean);
+
+                if (!tracks.length) return;
+                built.push({
+                    id,
+                    title: title || id,
+                    art: config.art || 'cover1.webp',
+                    thumb: config.thumb || config.art || 'cover1.webp',
+                    background: config.background || 'bg-wide.webp',
+                    backgroundTall: config.backgroundTall || config.background || 'bg-tall.webp',
+                    accent: config.accent || '',
+                    tracks
+                });
+            });
+
+            if (!built.length && master.length) {
+                built.push({
+                    id: 'borderline',
+                    title: 'Borderline',
+                    art: 'cover1.webp',
+                    thumb: 'cover1-thumb.webp',
+                    background: 'bg-wide.webp',
+                    backgroundTall: 'bg-tall.webp',
+                    tracks: master.slice()
+                });
+            }
+            return built;
+        }
+
+        function albumById(id) {
+            return albums.find(album => album.id === id) || null;
+        }
+
+        function backgroundImage(value, fallback) {
+            const file = String(value || fallback).replace(/["\\\r\n]/g, '');
+            return `url("${file}")`;
+        }
+
+        function applyAlbumBackground(album) {
+            document.body.style.setProperty('--album-bg', backgroundImage(album.background, 'bg-wide.webp'));
+            document.body.style.setProperty('--album-bg-tall', backgroundImage(album.backgroundTall || album.background, 'bg-tall.webp'));
+        }
+
+        function hexToRgb(value) {
+            const match = /^#([0-9a-f]{6})$/i.exec(String(value || '').trim());
+            if (!match) return null;
+            const number = parseInt(match[1], 16);
+            return { r: (number >> 16) & 255, g: (number >> 8) & 255, b: number & 255 };
+        }
+
+        // A pale version of the accent for text and active lyrics, where the
+        // base colour would be too dark against the glass.
+        function tintAccent(rgb, amount) {
+            const mix = channel => Math.round(channel + (255 - channel) * amount);
+            return `rgb(${mix(rgb.r)}, ${mix(rgb.g)}, ${mix(rgb.b)})`;
+        }
+
+        // Optional per-album accent; without one the emerald defaults in the
+        // stylesheet stay in place.
+        function applyAlbumAccent(album) {
+            const rgb = hexToRgb(album && album.accent);
+            const style = document.body.style;
+            const names = ['--accent', '--accent-light', '--accent-soft', '--accent-border', '--accent-glow', '--accent-bar'];
+            const meta = document.querySelector('meta[name="theme-color"]');
+
+            if (!rgb) {
+                names.forEach(name => style.removeProperty(name));
+                if (meta) meta.setAttribute('content', '#031a13');
+                return;
+            }
+
+            const hex = '#' + [rgb.r, rgb.g, rgb.b].map(value => value.toString(16).padStart(2, '0')).join('');
+            const rgba = alpha => `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+            style.setProperty('--accent', hex);
+            style.setProperty('--accent-light', tintAccent(rgb, 0.35));
+            style.setProperty('--accent-soft', rgba(0.2));
+            style.setProperty('--accent-border', rgba(0.5));
+            style.setProperty('--accent-glow', rgba(0.34));
+            style.setProperty('--accent-bar', rgba(0.16));
+            if (meta) meta.setAttribute('content', hex);
+        }
+
+        function updateSearchVisibility() {
+            // Search now spans albums, so a short active album is no reason to
+            // hide the box; only a library this small has nothing to search.
+            const total = albums.reduce((sum, album) => sum + album.tracks.length, 0);
+            searchInput.hidden = total <= 8;
+            if (searchInput.hidden) {
+                searchInput.value = '';
+                searchQuery = '';
+            }
+        }
+
+        function renderTabs() {
+            listTabs.innerHTML = '';
+            albums.forEach(album => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.dataset.list = album.id;
+                button.addEventListener('click', () => setList(album.id));
+                listTabs.appendChild(button);
+            });
+            const show = albums.length > 1;
+            listTabs.classList.toggle('hidden', !show);
+            listTabs.classList.toggle('flex', show);
+            if (albums.length) styleTabs(activeList || albums[0].id);
+        }
+
+        function styleTabs(name) {
+            listTabs.querySelectorAll('button').forEach(btn => {
+                const album = albumById(btn.dataset.list);
+                if (!album) return;
+                const on = album.id === name;
+                const runtime = album.tracks.reduce((sum, song) => sum + (song.duration || 0), 0);
+                const runtimeText = runtime ? ' \u00b7 ' + formatRuntime(runtime) : '';
+                btn.className = 'album-tab flex items-center gap-3 w-full text-left p-2 rounded-lg border transition' + (on ? ' is-active' : '');
+                btn.setAttribute('aria-pressed', String(on));
+                btn.setAttribute('aria-label', `${album.title}, ${album.tracks.length} track${album.tracks.length === 1 ? '' : 's'}${runtime ? ', ' + formatRuntime(runtime) : ''}`);
+                btn.replaceChildren();
+
+                const thumb = document.createElement('img');
+                thumb.className = 'album-thumb';
+                thumb.src = album.thumb || album.art || 'cover1.webp';
+                thumb.alt = '';
+                thumb.addEventListener('error', () => {
+                    if (!thumb.src.endsWith('/cover1.webp')) thumb.src = 'cover1.webp';
+                });
+
+                const wrap = document.createElement('span');
+                wrap.className = 'min-w-0';
+                const title = document.createElement('span');
+                title.className = 'album-tab-title block text-xs font-bold leading-tight';
+                title.textContent = album.title;
+                const meta = document.createElement('span');
+                meta.className = 'block text-[10px] text-gray-500 mt-0.5';
+                meta.textContent = `${album.tracks.length} track${album.tracks.length === 1 ? '' : 's'}${runtimeText}`;
+                wrap.append(title, meta);
+                btn.append(thumb, wrap);
+            });
+        }
+
+        function setList(name, options) {
+            const opts = options || {};
+            const album = albumById(name) || albums[0];
+            if (!album) return;
+
+            activeList = album.id;
+            activeAlbum = album;
+            window.myPlaylist = album.tracks;
+            const wasPlaying = !audio.paused && !audio.ended;
+            const savedIndex = opts.index != null ? opts.index : (listPositions[activeList] || 0);
+            currentSongIndex = Math.min(Math.max(savedIndex, 0), Math.max(album.tracks.length - 1, 0));
+            styleTabs(activeList);
+            applyAlbumBackground(album);
+            applyAlbumAccent(album);
+            updateAlbumDownloadButton();
+            searchInput.value = '';
+            searchQuery = '';
+            updateSearchVisibility();
+            if (shuffleOn) shuffleOrder = buildShuffleOrder(currentSongIndex, album.tracks.length);
+            renderModes();
+            if (album.tracks.length) {
+                loadSong(currentSongIndex, { startAt: opts.startAt || 0 });
+                if (wasPlaying || opts.play) playSong();
+            }
+        }
+
+        renderTabs();
+
+        window.addEventListener('pagehide', () => savePrefs(true));
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') savePrefs(true);
+        });
+
+        window.onload = () => {
+            if (!albums.length) {
+                setSongLabels("Playlist Not Found", "Check playlist.js and remixes.js");
+                return;
+            }
+
+            // A shared link wins over the last session; otherwise continue where
+            // the listener left off. The album is optional in older links.
+            const params = new URLSearchParams(location.search);
+            const fromUrl = findTrackBySlug(params.get('track'), params.get('album'));
+            const savedAlbum = albumById(savedPrefs.list);
+            let startAlbum = fromUrl ? albumById(fromUrl.album) : (savedAlbum || albums[0]);
+            if (!startAlbum) startAlbum = albums[0];
+            let startIndex = fromUrl ? fromUrl.index : (listPositions[startAlbum.id] || 0);
+            let startAt = 0;
+
+            if (!fromUrl && savedPrefs.track) {
+                // Tracks can move between albums, so the saved index may point at
+                // a different song now. Find the saved title, here or elsewhere.
+                const sameAlbum = startAlbum.tracks.findIndex(song => slugify(song.title) === savedPrefs.track);
+                if (sameAlbum > -1) {
+                    startIndex = sameAlbum;
+                    if (savedPrefs.position > 2) startAt = Number(savedPrefs.position) || 0;
+                } else {
+                    const elsewhere = albums
+                        .map(album => ({
+                            album,
+                            index: album.tracks.findIndex(song => slugify(song.title) === savedPrefs.track)
+                        }))
+                        .find(entry => entry.index > -1);
+                    if (elsewhere) {
+                        startAlbum = elsewhere.album;
+                        startIndex = elsewhere.index;
+                        if (savedPrefs.position > 2) startAt = Number(savedPrefs.position) || 0;
+                    }
+                }
+            }
+
+            setList(startAlbum.id, { index: startIndex, startAt });
+            updatePositionState();
+        };
+    </script>
+</body>
+</html>

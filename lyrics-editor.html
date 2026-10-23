@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Lyric timing · Borderline Project</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #04110d;
+            --panel: rgba(12, 26, 21, 0.82);
+            --panel-solid: #07110e;
+            --line: rgba(52, 211, 153, 0.18);
+            --line-strong: rgba(52, 211, 153, 0.45);
+            --text: #e6f6ee;
+            --muted: #8fae9f;
+            --accent: #34d399;
+            --accent-strong: #6ee7b7;
+            --danger: #f87171;
+            --warn: #fbbf24;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            background:
+                radial-gradient(1100px 600px at 15% -10%, rgba(16, 92, 68, 0.5), transparent 65%),
+                radial-gradient(900px 500px at 110% 10%, rgba(6, 56, 43, 0.55), transparent 60%),
+                var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app {
+            max-width: 1220px;
+            margin: 0 auto;
+            padding: clamp(16px, 3vw, 32px);
+            padding-bottom: 40px;
+        }
+
+        header.top {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .cover {
+            width: 58px;
+            height: 58px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            flex: none;
+        }
+
+        .eyebrow {
+            margin: 0 0 4px;
+            font-size: 0.68rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent-strong);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+        }
+
+        .lead {
+            margin: 6px 0 0;
+            max-width: 62ch;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .topLink {
+            margin-left: auto;
+            align-self: flex-start;
+            color: var(--muted);
+            font-size: 0.82rem;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            padding: 8px 14px;
+            white-space: nowrap;
+        }
+        .topLink:hover { color: var(--accent-strong); border-color: var(--line-strong); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .col { display: grid; gap: 18px; min-width: 0; }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: clamp(14px, 2vw, 20px);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+            min-width: 0;
+        }
+
+        .panelHead {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .pill {
+            font-size: 0.7rem;
+            color: var(--muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            padding: 3px 9px;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .field { display: grid; gap: 6px; }
+
+        label, .label {
+            font-size: 0.68rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        select, textarea, input[type="number"] {
+            font: inherit;
+            color: var(--text);
+            background: var(--panel-solid);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            min-height: 42px;
+            padding: 9px 11px;
+        }
+
+        select { width: 100%; }
+        select:focus-visible, textarea:focus-visible, input:focus-visible, button:focus-visible {
+            outline: 2px solid var(--accent-strong);
+            outline-offset: 2px;
+        }
+
+        .player {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .time {
+            margin-left: auto;
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rate {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+        }
+        .rate select { min-height: 34px; padding: 4px 8px; width: auto; font-size: 0.8rem; }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0 2px;
+            accent-color: var(--accent);
+            height: 22px;
+        }
+
+        button {
+            font: inherit;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            min-height: 42px;
+            padding: 9px 14px;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+            touch-action: manipulation;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.1); }
+        button:active { transform: translateY(1px); }
+        button:disabled { opacity: 0.42; cursor: not-allowed; }
+        button:disabled:hover { background: rgba(255, 255, 255, 0.06); }
+
+        button.primary {
+            background: var(--accent);
+            border-color: transparent;
+            color: #04211a;
+            font-weight: 650;
+        }
+        button.primary:hover { background: var(--accent-strong); }
+
+        button.stamp {
+            background: rgba(52, 211, 153, 0.16);
+            border-color: var(--line-strong);
+            color: var(--accent-strong);
+            font-weight: 650;
+        }
+        button.stamp:hover { background: rgba(52, 211, 153, 0.24); }
+
+        button.danger { color: #fca5a5; }
+        button.danger:hover { background: rgba(248, 113, 113, 0.12); }
+
+        .compact { min-height: 36px; padding: 6px 10px; font-size: 0.82rem; }
+
+        kbd {
+            font-family: inherit;
+            font-size: 0.66rem;
+            line-height: 1.4;
+            padding: 1px 6px;
+            margin-left: 8px;
+            border: 1px solid var(--line);
+            border-bottom-width: 2px;
+            border-radius: 5px;
+            color: var(--muted);
+            background: rgba(0, 0, 0, 0.28);
+            white-space: nowrap;
+        }
+
+        .next {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin: 14px 0 8px;
+            padding: 9px 12px;
+            min-height: 44px;
+            border-radius: 10px;
+            background: rgba(52, 211, 153, 0.07);
+            border: 1px solid rgba(52, 211, 153, 0.16);
+        }
+        .next .label { flex: none; }
+        .next strong {
+            font-weight: 500;
+            font-size: 0.92rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .stampRow { display: flex; gap: 10px; }
+        .stampRow .stamp { flex: 1; }
+
+        .hint {
+            margin: 10px 0 0;
+            font-size: 0.76rem;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        .note {
+            margin: 10px 0 0;
+            min-height: 1.3em;
+            font-size: 0.8rem;
+            line-height: 1.45;
+            color: var(--muted);
+        }
+        .note.warn { color: var(--warn); }
+        .note.error { color: var(--danger); }
+
+        textarea {
+            width: 100%;
+            min-height: 196px;
+            resize: vertical;
+            line-height: 1.55;
+            font-size: 0.94rem;
+            font-family: inherit;
+            padding: 11px 12px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            align-items: center;
+        }
+        .row .push { margin-left: auto; }
+
+        .timeline {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 54vh;
+            overflow: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(52, 211, 153, 0.35) transparent;
+        }
+        .timeline::-webkit-scrollbar { width: 8px; }
+        .timeline::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.3); border-radius: 999px; }
+
+        .tl {
+            display: grid;
+            grid-template-columns: 2.1rem minmax(0, 1fr) 5rem 2.1rem;
+            gap: 8px;
+            align-items: center;
+            padding: 5px 7px;
+            border-left: 2px solid transparent;
+            border-radius: 8px;
+        }
+        .tl + .tl { margin-top: 1px; }
+        .tl.active { background: rgba(52, 211, 153, 0.12); border-left-color: var(--accent); }
+        .tl.timed .idx { color: var(--accent-strong); }
+
+        .idx {
+            font-size: 0.7rem;
+            color: rgba(143, 174, 159, 0.65);
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+
+        .tlText {
+            background: none;
+            border: 0;
+            padding: 4px 0;
+            min-height: 34px;
+            text-align: left;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        .tlText:hover { background: none; text-decoration: underline dotted rgba(110, 231, 183, 0.55); }
+        .tl:not(.timed) .tlText { color: var(--muted); }
+
+        .timeInput {
+            width: 100%;
+            min-height: 34px;
+            padding: 4px 6px;
+            font-size: 0.82rem;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        .timeInput::-webkit-outer-spin-button,
+        .timeInput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .timeInput { -moz-appearance: textfield; appearance: textfield; }
+
+        .target {
+            width: 34px;
+            min-height: 34px;
+            padding: 0;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+        .target:hover { color: var(--accent-strong); }
+
+        .empty, .placeholder {
+            margin: 0;
+            padding: 18px 4px;
+            color: var(--muted);
+            font-size: 0.86rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .preview {
+            margin: 0;
+            padding: 12px;
+            max-height: 270px;
+            overflow: auto;
+            background: var(--panel-solid);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 10px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.75rem;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #bfe8d5;
+        }
+
+        .problems {
+            margin: 10px 0 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 4px;
+            font-size: 0.78rem;
+            line-height: 1.45;
+        }
+        .problems .warn { color: var(--warn); }
+        .problems .bad { color: var(--danger); }
+
+        .status {
+            margin: 10px 0 0;
+            min-height: 1.3em;
+            font-size: 0.8rem;
+            color: var(--accent-strong);
+        }
+        .status.bad { color: var(--danger); }
+
+        .mobileBar { display: none; }
+
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .topLink { display: none; }
+            h1 { font-size: 1.45rem; }
+            .lead { font-size: 0.82rem; }
+            .cover { width: 48px; height: 48px; }
+            .timeline { max-height: none; }
+            .app { padding-bottom: 104px; }
+
+            .mobileBar {
+                display: flex;
+                gap: 8px;
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 20;
+                padding: 10px max(12px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-right, 0px));
+                background: rgba(4, 17, 13, 0.94);
+                border-top: 1px solid var(--line);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+            }
+            .mobileBar button { flex: 1; }
+            .mobileBar .stamp { flex: 1.7; }
+        }
+
+        @media (max-width: 420px) {
+            .tl { grid-template-columns: 1.8rem minmax(0, 1fr) 4.4rem 1.9rem; gap: 5px; }
+            .panel { padding: 13px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <img class="cover" src="cover1-thumb.webp" alt="">
+            <div>
+                <p class="eyebrow">Borderline Project · studio</p>
+                <h1>Lyric timing</h1>
+                <p class="lead">Play a track and press <kbd>Space</kbd> as each line begins. Work is saved per track in this browser, then copied into <code>playlist.js</code>.</p>
+            </div>
+            <a class="topLink" href="index.html">← Open player</a>
+        </header>
+
+        <main class="grid">
+            <div class="col">
+                <section class="panel" aria-labelledby="player-title">
+                    <div class="panelHead">
+                        <h2 id="player-title">Track</h2>
+                        <span class="pill" id="progressPill">—</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="track">Song</label>
+                        <select id="track"></select>
+                    </div>
+
+                    <div class="player">
+                        <button type="button" id="play" class="primary">Play</button>
+                        <button type="button" id="back" class="compact" title="Back 5 seconds">−5s</button>
+                        <button type="button" id="fwd" class="compact" title="Forward 5 seconds">+5s</button>
+                        <label class="rate">Speed
+                            <select id="rate">
+                                <option value="0.5">0.5×</option>
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1×</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                            </select>
+                        </label>
+                        <span class="time"><span id="now">0:00</span> / <span id="dur">0:00</span></span>
+                    </div>
+
+                    <input id="seek" type="range" min="0" max="0" step="0.05" value="0" aria-label="Seek through the track">
+
+                    <div class="next">
+                        <span class="label">Next line</span>
+                        <strong id="nextText">—</strong>
+                    </div>
+
+                    <div class="stampRow">
+                        <button type="button" id="stamp" class="stamp">Stamp line<kbd>Space</kbd></button>
+                        <button type="button" id="undo" class="compact">Undo<kbd>⌫</kbd></button>
+                    </div>
+
+                    <p class="note" id="note" role="status" aria-live="polite"></p>
+                    <p class="hint">Space or the Stamp button marks the next line. ⌫ clears the last time. ← → skip five seconds; P plays or pauses.</p>
+                </section>
+
+                <section class="panel" aria-labelledby="lyrics-title">
+                    <div class="panelHead">
+                        <h2 id="lyrics-title">Lyrics</h2>
+                        <span class="pill" id="lineCount">0 lines</span>
+                    </div>
+                    <label class="label" for="lines">One line per row</label>
+                    <textarea id="lines" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste the lyrics here, one line per row. Blank rows are ignored."></textarea>
+                    <div class="row">
+                        <button type="button" id="apply" class="primary">Use these lines</button>
+                        <button type="button" id="importLrc" title="Import one .lrc for this track, or several to match by file name">Import .lrc</button>
+                        <button type="button" id="reset" class="danger push">Reset timings</button>
+                    </div>
+                    <input type="file" id="lrcFile" accept=".lrc,text/plain" multiple hidden>
+                    <p class="hint">Applying new lines keeps timings by position, so reset first if the lyrics changed order. Importing one .lrc replaces this track's lyrics and timings; select several at once and each file is matched to a track by its file name. Everything is saved automatically.</p>
+                </section>
+            </div>
+
+            <div class="col">
+                <section class="panel" aria-labelledby="timeline-title">
+                    <div class="panelHead">
+                        <h2 id="timeline-title">Timeline</h2>
+                        <span class="pill" id="timedCount">0 timed</span>
+                    </div>
+                    <ol class="timeline" id="timeline"></ol>
+                    <p class="empty" id="empty">Paste lyrics and choose “Use these lines” to begin timing.</p>
+                </section>
+
+                <section class="panel" aria-labelledby="export-title">
+                    <div class="panelHead">
+                        <h2 id="export-title">Export</h2>
+                        <span class="pill" id="exportState">—</span>
+                    </div>
+                    <pre class="preview" id="preview" aria-label="Playlist entry preview"></pre>
+                    <ul class="problems" id="problems"></ul>
+                    <div class="row">
+                        <button type="button" id="copyLyrics">Copy lyrics array</button>
+                        <button type="button" id="copyEntry" class="primary">Copy playlist entry</button>
+                    </div>
+                    <div class="row">
+                        <button type="button" id="download">Download .txt</button>
+                        <button type="button" id="downloadLrc">Download .lrc</button>
+                    </div>
+                    <p class="status" id="status" role="status" aria-live="polite"></p>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="mobileBar">
+        <button type="button" id="mPlay" class="primary">Play</button>
+        <button type="button" id="mStamp" class="stamp">Stamp</button>
+        <button type="button" id="mUndo">Undo</button>
+    </div>
+
+    <script src="playlist.js"></script>
+    <script src="remixes.js"></script>
+    <script>
+    (() => {
+        'use strict';
+
+        const $ = id => document.getElementById(id);
+        const tracks = Array.isArray(window.myPlaylist) ? window.myPlaylist : [];
+        const albums = Array.isArray(window.myAlbums) ? window.myAlbums : [];
+
+        // Tracks are grouped into albums in remixes.js; the LRC album tag is
+        // filled from there so Extras and Instrumentals songs are not labelled
+        // as Borderline.
+        function normalizeFile(file) {
+            return String(file || '')
+                .replace(/\\/g, '/')
+                .replace(/^\.?\//, '')
+                .replace(/^music\//i, '')
+                .toLowerCase();
+        }
+
+        const albumByFile = new Map();
+        albums.forEach(album => {
+            const title = String(album && album.title || '').trim();
+            if (!title) return;
+            (Array.isArray(album.tracks) ? album.tracks : []).forEach(entry => {
+                const file = typeof entry === 'string' ? entry : entry && entry.file;
+                const key = normalizeFile(file);
+                if (key && !albumByFile.has(key)) albumByFile.set(key, title);
+            });
+        });
+
+        function trackAlbum(song) {
+            return albumByFile.get(normalizeFile(song && song.file)) || '';
+        }
+        const STORE_PREFIX = 'borderline-lyrics-studio-v1:';
+        const LAST_TRACK = 'borderline-lyrics-studio:last';
+
+        const trackSelect = $('track');
+        const playBtn = $('play');
+        const mobilePlay = $('mPlay');
+        const stampBtn = $('stamp');
+        const mobileStamp = $('mStamp');
+        const undoBtn = $('undo');
+        const mobileUndo = $('mUndo');
+        const backBtn = $('back');
+        const fwdBtn = $('fwd');
+        const rateSelect = $('rate');
+        const seek = $('seek');
+        const nowEl = $('now');
+        const durEl = $('dur');
+        const nextText = $('nextText');
+        const noteEl = $('note');
+        const linesInput = $('lines');
+        const applyBtn = $('apply');
+        const resetBtn = $('reset');
+        const lineCountEl = $('lineCount');
+        const timedCountEl = $('timedCount');
+        const progressPill = $('progressPill');
+        const timeline = $('timeline');
+        const emptyEl = $('empty');
+        const previewEl = $('preview');
+        const problemsEl = $('problems');
+        const exportState = $('exportState');
+        const statusEl = $('status');
+        const copyLyricsBtn = $('copyLyrics');
+        const copyEntryBtn = $('copyEntry');
+        const downloadBtn = $('download');
+        const downloadLrcBtn = $('downloadLrc');
+        const importLrcBtn = $('importLrc');
+        const lrcInput = $('lrcFile');
+
+        const audio = new Audio();
+        audio.preload = 'metadata';
+
+        let track = null;
+        let trackIndex = 0;
+        let lines = [];
+        let times = [];
+        let active = 0;
+        let dragging = false;
+        let saveTimer = null;
+        let statusTimer = null;
+
+        // ---------- helpers ----------
+
+        function fmtClock(seconds) {
+            if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+            const total = Math.floor(seconds);
+            const mins = Math.floor(total / 60);
+            const secs = total % 60;
+            return `${mins}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function fmtStamp(value) {
+            return String(Math.round(value * 10) / 10);
+        }
+
+        function roundTime(value) {
+            return Math.round(value * 10) / 10;
+        }
+
+        function slug(value) {
+            return String(value).replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase();
+        }
+
+        function note(text, tone) {
+            noteEl.textContent = text || '';
+            noteEl.className = 'note' + (tone ? ' ' + tone : '');
+        }
+
+        function flash(text, tone) {
+            statusEl.textContent = text;
+            statusEl.className = 'status' + (tone === 'bad' ? ' bad' : '');
+            clearTimeout(statusTimer);
+            if (text) {
+                statusTimer = setTimeout(() => {
+                    statusEl.textContent = '';
+                    statusEl.className = 'status';
+                }, 6000);
+            }
+        }
+
+        function storageGet(key) {
+            try { return localStorage.getItem(key); } catch (error) { return null; }
+        }
+
+        function storageSet(key, value) {
+            try { localStorage.setItem(key, value); return true; } catch (error) { return false; }
+        }
+
+        function storageRemove(key) {
+            try { localStorage.removeItem(key); } catch (error) { /* ignore */ }
+        }
+
+        function firstUntimed() {
+            for (let i = 0; i < lines.length; i += 1) {
+                if (times[i] == null) return i;
+            }
+            return lines.length;
+        }
+
+        function nextUntimed(from) {
+            for (let i = Math.max(0, from); i < lines.length; i += 1) {
+                if (times[i] == null) return i;
+            }
+            return lines.length;
+        }
+
+        function lastTimedIndex() {
+            for (let i = times.length - 1; i >= 0; i -= 1) {
+                if (times[i] != null) return i;
+            }
+            return -1;
+        }
+
+        function timedPairs() {
+            const pairs = [];
+            lines.forEach((text, i) => {
+                if (times[i] != null) pairs.push({ time: times[i], text, index: i });
+            });
+            return pairs;
+        }
+
+        // ---------- saved work ----------
+
+        function loadSaved(forTrack) {
+            const raw = storageGet(STORE_PREFIX + forTrack.file);
+            if (!raw) return null;
+            try {
+                const saved = JSON.parse(raw);
+                const savedLines = Array.isArray(saved && saved.lines)
+                    ? saved.lines.map(line => String(line))
+                    : [];
+                const savedTimes = savedLines.map((_, i) => {
+                    const value = saved && Array.isArray(saved.times) ? Number(saved.times[i]) : NaN;
+                    return Number.isFinite(value) && value >= 0 ? roundTime(value) : null;
+                });
+                const draft = saved && typeof saved.draft === 'string' ? saved.draft : savedLines.join('\n');
+                let restoredActive = saved && Number.isInteger(saved.active) ? saved.active : 0;
+                if (restoredActive < 0 || restoredActive > savedLines.length) restoredActive = 0;
+                return { lines: savedLines, times: savedTimes, active: restoredActive, draft };
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function save() {
+            if (!track) return;
+            const payload = { lines, times, active, draft: linesInput.value };
+            storageSet(STORE_PREFIX + track.file, JSON.stringify(payload));
+            storageSet(LAST_TRACK, track.file);
+        }
+
+        function scheduleSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(save, 250);
+        }
+
+        // ---------- playback ----------
+
+        function updatePlayButtons() {
+            const label = audio.paused ? 'Play' : 'Pause';
+            playBtn.textContent = label;
+            mobilePlay.textContent = label;
+        }
+
+        function updateTimes() {
+            nowEl.textContent = fmtClock(audio.currentTime);
+            const duration = Number.isFinite(audio.duration) && audio.duration > 0
+                ? audio.duration
+                : (track ? track.duration : 0);
+            durEl.textContent = fmtClock(duration);
+            if (!dragging && Number.isFinite(audio.duration) && audio.duration > 0) {
+                seek.value = String(Math.min(audio.currentTime, audio.duration));
+            }
+        }
+
+        function togglePlay() {
+            if (!track) return;
+            if (audio.paused) {
+                audio.play().catch(() => {
+                    note('The browser blocked playback. Press Play once by hand.', 'warn');
+                });
+            } else {
+                audio.pause();
+            }
+        }
+
+        function nudge(seconds) {
+            if (!track || !Number.isFinite(audio.duration)) return;
+            audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + seconds));
+            updateTimes();
+        }
+
+        audio.addEventListener('loadedmetadata', () => {
+            if (Number.isFinite(audio.duration)) {
+                seek.max = String(audio.duration);
+                durEl.textContent = fmtClock(audio.duration);
+            }
+            updateTimes();
+        });
+
+        audio.addEventListener('timeupdate', updateTimes);
+        audio.addEventListener('play', updatePlayButtons);
+        audio.addEventListener('pause', updatePlayButtons);
+        audio.addEventListener('ended', updatePlayButtons);
+        audio.addEventListener('error', () => {
+            if (track) note(`Could not load music/${track.file}.`, 'error');
+        });
+        audio.addEventListener('ratechange', () => {
+            rateSelect.value = String(audio.playbackRate);
+        });
+
+        // ---------- stamping ----------
+
+        function stamp() {
+            if (!track) return;
+            if (!lines.length) {
+                note('Paste the lyrics first, then choose “Use these lines”.', 'warn');
+                return;
+            }
+            const index = nextUntimed(active);
+            if (index >= lines.length) {
+                note('Every line already has a time. Use ⌫ to undo the last one, or Reset timings.', 'warn');
+                return;
+            }
+            const at = roundTime(Math.min(audio.currentTime || 0, Number.isFinite(audio.duration) ? audio.duration : Infinity));
+            times[index] = at;
+            active = nextUntimed(index + 1);
+            save();
+            render();
+            scrollToLine(index);
+            note(`Line ${index + 1} stamped at ${fmtStamp(at)}s${audio.paused ? ' (paused)' : ''}.`);
+        }
+
+        function undo() {
+            if (!track) return;
+            const index = lastTimedIndex();
+            if (index < 0) {
+                note('Nothing to undo yet.', 'warn');
+                return;
+            }
+            times[index] = null;
+            active = index;
+            save();
+            render();
+            scrollToLine(index);
+            note(`Cleared the time for line ${index + 1}.`);
+        }
+
+        function seekToLine(index) {
+            if (!Number.isFinite(audio.duration)) return;
+            if (times[index] != null) {
+                audio.currentTime = Math.min(times[index], audio.duration);
+                updateTimes();
+            }
+        }
+
+        function scrollToLine(index) {
+            const row = timeline.querySelector(`[data-i="${index}"]`);
+            if (row) row.scrollIntoView({ block: 'nearest' });
+        }
+
+        // ---------- rendering ----------
+
+        function renderStats() {
+            const timed = times.filter(value => value != null).length;
+            lineCountEl.textContent = `${lines.length} line${lines.length === 1 ? '' : 's'}`;
+            timedCountEl.textContent = `${timed} timed`;
+            progressPill.textContent = lines.length ? `${timed}/${lines.length}` : '—';
+
+            if (!lines.length) {
+                nextText.textContent = '—';
+            } else if (active >= lines.length) {
+                nextText.textContent = 'All lines timed — press ⌫ to undo one';
+            } else {
+                nextText.textContent = `${active + 1}. ${lines[active]}`;
+            }
+        }
+
+        function renderTimeline() {
+            timeline.innerHTML = '';
+            emptyEl.hidden = lines.length > 0;
+            if (!lines.length) return;
+
+            const fragment = document.createDocumentFragment();
+            lines.forEach((text, i) => {
+                const item = document.createElement('li');
+                item.className = 'tl' + (i === active ? ' active' : '') + (times[i] != null ? ' timed' : '');
+                item.dataset.i = String(i);
+                if (i === active) item.setAttribute('aria-current', 'step');
+
+                const index = document.createElement('span');
+                index.className = 'idx';
+                index.textContent = String(i + 1).padStart(2, '0');
+
+                const textBtn = document.createElement('button');
+                textBtn.type = 'button';
+                textBtn.className = 'tlText';
+                textBtn.textContent = text;
+                textBtn.title = times[i] != null ? `Seek to ${fmtStamp(times[i])}s` : 'Make this the next line to stamp';
+                textBtn.addEventListener('click', () => {
+                    if (times[i] != null) {
+                        active = i;
+                        seekToLine(i);
+                        note(`Jumped to line ${i + 1} at ${fmtStamp(times[i])}s.`);
+                    } else {
+                        active = i;
+                        note(`Line ${i + 1} is next. Press Stamp when it begins.`);
+                    }
+                    render();
+                    scrollToLine(i);
+                });
+
+                const timeInput = document.createElement('input');
+                timeInput.type = 'number';
+                timeInput.className = 'timeInput';
+                timeInput.min = '0';
+                timeInput.step = '0.1';
+                timeInput.inputMode = 'decimal';
+                timeInput.placeholder = '—';
+                timeInput.setAttribute('aria-label', `Time for line ${i + 1}`);
+                if (times[i] != null) timeInput.value = fmtStamp(times[i]);
+                timeInput.addEventListener('change', () => {
+                    const value = parseFloat(timeInput.value);
+                    times[i] = Number.isFinite(value) && value >= 0 ? roundTime(value) : null;
+                    active = firstUntimed();
+                    save();
+                    render();
+                    note(times[i] == null ? `Cleared line ${i + 1}.` : `Line ${i + 1} set to ${fmtStamp(times[i])}s.`);
+                });
+
+                const target = document.createElement('button');
+                target.type = 'button';
+                target.className = 'target';
+                target.textContent = '↳';
+                target.title = 'Stamp from this line';
+                target.setAttribute('aria-label', `Make line ${i + 1} the next line to stamp`);
+                target.addEventListener('click', () => {
+                    active = i;
+                    const previous = times[i - 1];
+                    if (previous != null) {
+                        audio.currentTime = previous;
+                        updateTimes();
+                    }
+                    render();
+                    scrollToLine(i);
+                    note(`Stamping from line ${i + 1}. Rewind and press Stamp when it begins.`);
+                });
+
+                item.append(index, textBtn, timeInput, target);
+                fragment.appendChild(item);
+            });
+            timeline.appendChild(fragment);
+        }
+
+        function analyze() {
+            const pairs = timedPairs();
+            const problems = [];
+            let ordered = true;
+            let previous = -Infinity;
+            let orderLine = null;
+            pairs.forEach(pair => {
+                if (pair.time < previous) {
+                    ordered = false;
+                    if (orderLine == null) orderLine = pair.index + 1;
+                }
+                previous = pair.time;
+            });
+            const duration = Number.isFinite(audio.duration) && audio.duration > 0
+                ? audio.duration
+                : (track ? track.duration : null);
+            if (duration) {
+                const beyond = pairs.find(pair => pair.time > duration + 2);
+                if (beyond) problems.push({ tone: 'warn', text: `Line ${beyond.index + 1} is timed past the end of the track (${fmtClock(beyond.time)}).` });
+            }
+            const untimed = lines.length - pairs.length;
+            if (untimed > 0 && lines.length) {
+                problems.push({ tone: 'warn', text: `${untimed} line${untimed === 1 ? '' : 's'} without a time will be left out of the export.` });
+            }
+            if (!ordered) {
+                problems.push({ tone: 'bad', text: `Times go backwards at line ${orderLine}. Exports need them to rise with the lyric order.` });
+            }
+            return { pairs, ordered, problems, duration };
+        }
+
+        function lyricsBlock() {
+            const pairs = timedPairs();
+            if (!pairs.length) return '        lyrics: [\n        ]';
+            const rows = pairs
+                .map(pair => `            { time: ${fmtStamp(pair.time)}, text: ${JSON.stringify(pair.text)} },`)
+                .join('\n');
+            return `        lyrics: [\n${rows}\n        ]`;
+        }
+
+        function entryBlock(withComma) {
+            if (!track) return '';
+            const rows = [
+                '    {',
+                `        title: ${JSON.stringify(track.title)},`,
+                `        artist: ${JSON.stringify(track.artist || 'Borderline')},`,
+                `        file: ${JSON.stringify(track.file)},`,
+                `        duration: ${Number.isFinite(track.duration) ? track.duration : 0},`,
+                `        bytes: ${Number.isFinite(track.bytes) ? track.bytes : 0},`,
+                lyricsBlock(),
+                `    }${withComma === false ? '' : ','}`
+            ];
+            return rows.join('\n');
+        }
+
+        function renderExport() {
+            const { pairs, ordered, problems } = analyze();
+            previewEl.textContent = track ? entryBlock(true) : '// Choose a track to begin.';
+
+            problemsEl.innerHTML = '';
+            problems.forEach(problem => {
+                const item = document.createElement('li');
+                item.className = problem.tone;
+                item.textContent = problem.text;
+                problemsEl.appendChild(item);
+            });
+
+            let state = '—';
+            if (track) {
+                if (!lines.length) state = 'No lyrics';
+                else if (!pairs.length) state = 'Not started';
+                else if (!ordered) state = 'Fix order';
+                else if (pairs.length < lines.length) state = `${pairs.length}/${lines.length} timed`;
+                else state = 'Ready';
+            }
+            exportState.textContent = state;
+
+            const blocked = !track || !pairs.length || !ordered;
+            copyLyricsBtn.disabled = blocked;
+            copyEntryBtn.disabled = blocked;
+            downloadBtn.disabled = blocked;
+            downloadLrcBtn.disabled = blocked;
+        }
+
+        function render() {
+            renderStats();
+            renderTimeline();
+            renderExport();
+        }
+
+        // ---------- applying lyrics ----------
+
+        function applyLines() {
+            const next = linesInput.value
+                .split(/\r?\n/)
+                .map(line => line.trim())
+                .filter(Boolean);
+            if (!next.length) {
+                note('Paste at least one lyric line first.', 'warn');
+                return;
+            }
+            const previousCount = lines.length;
+            const keptTimes = next.map((_, i) => (times[i] != null ? times[i] : null));
+            lines = next;
+            times = keptTimes;
+            active = firstUntimed();
+            save();
+            render();
+            linesInput.blur();
+            if (next.length > active) scrollToLine(active);
+            const changed = previousCount && previousCount !== next.length;
+            note(`Ready with ${next.length} line${next.length === 1 ? '' : 's'}.${changed ? ' Timings were kept by position — reset them if the lyrics changed.' : ''}`);
+        }
+
+        function resetTimings() {
+            if (!lines.length && !times.some(value => value != null)) return;
+            if (!window.confirm(`Clear every time for “${track ? track.title : 'this track'}”? The lyrics stay.`)) return;
+            times = new Array(lines.length).fill(null);
+            active = 0;
+            save();
+            render();
+            scrollToLine(0);
+            note('All times cleared.');
+        }
+
+        // ---------- lrc ----------
+
+        function parseLrc(text) {
+            const meta = {};
+            const entries = [];
+            const timeTag = /^\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]\s*/;
+            const metaTag = /^\[([a-z]+)\s*:\s*(.*?)\]\s*$/i;
+            let order = 0;
+
+            String(text).split(/\r?\n/).forEach(raw => {
+                const line = raw.trim();
+                if (!line) return;
+
+                let rest = line;
+                const stamps = [];
+                let match;
+                while ((match = timeTag.exec(rest))) {
+                    const fraction = match[3] || '';
+                    const seconds = Number(match[1]) * 60 + Number(match[2])
+                        + (fraction ? Number(fraction) / Math.pow(10, fraction.length) : 0);
+                    stamps.push(seconds);
+                    rest = rest.slice(match[0].length);
+                }
+
+                if (stamps.length) {
+                    // Enhanced LRC can carry word timings inside the line; keep the words.
+                    const lyric = rest.replace(/<\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?>/g, '').trim();
+                    if (!lyric) return;
+                    stamps.forEach(time => {
+                        entries.push({ time, text: lyric, order: order += 1 });
+                    });
+                    return;
+                }
+
+                const metaMatch = metaTag.exec(line);
+                if (metaMatch) meta[metaMatch[1].toLowerCase()] = metaMatch[2].trim();
+            });
+
+            const rawOffset = Number.parseInt(meta.offset, 10);
+            const offsetSeconds = Number.isFinite(rawOffset) ? rawOffset / 1000 : 0;
+            const timed = entries
+                .map(entry => ({ ...entry, time: roundTime(Math.max(0, entry.time + offsetSeconds)) }))
+                .sort((a, b) => a.time - b.time || a.order - b.order);
+
+            return {
+                lines: timed.map(entry => entry.text),
+                times: timed.map(entry => entry.time),
+                count: timed.length,
+                offsetSeconds
+            };
+        }
+
+        function lrcTimestamp(value) {
+            const centis = Math.max(0, Math.round(value * 100));
+            const minutes = Math.floor(centis / 6000);
+            const seconds = Math.floor((centis % 6000) / 100);
+            const hundredths = centis % 100;
+            return `[${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}]`;
+        }
+
+        function lrcMeta(value) {
+            return String(value || '').replace(/[\r\n]+/g, ' ').replace(/[\[\]]/g, '').trim();
+        }
+
+        function buildLrc() {
+            if (!track) return '';
+            const head = [
+                `[ti:${lrcMeta(track.title)}]`,
+                `[ar:${lrcMeta(track.artist || 'Borderline')}]`
+            ];
+            const album = trackAlbum(track);
+            // A track that is not in any album gets no album tag rather than a
+            // misleading one.
+            if (album) head.push(`[al:${lrcMeta(album)}]`);
+            const rows = timedPairs().map(pair => `${lrcTimestamp(pair.time)}${pair.text.replace(/[\r\n]+/g, ' ')}`);
+            return head.join('\n') + (rows.length ? '\n\n' + rows.join('\n') : '') + '\n';
+        }
+
+        async function importLrc(file) {
+            if (!track) {
+                note('Choose a track before importing lyrics.', 'warn');
+                return;
+            }
+            let text;
+            try {
+                text = await file.text();
+            } catch (error) {
+                note(`Could not read ${file.name}.`, 'error');
+                return;
+            }
+
+            const parsed = parseLrc(text);
+            if (!parsed.count) {
+                note(`${file.name} has no [mm:ss] timestamps to import.`, 'warn');
+                return;
+            }
+
+            const hasWork = lines.length > 0 || times.some(value => value != null);
+            if (hasWork && !window.confirm(`Replace the current lyrics and timings for “${track.title}” with ${file.name}?`)) return;
+
+            lines = parsed.lines;
+            times = parsed.times;
+            active = firstUntimed();
+            linesInput.value = lines.join('\n');
+            save();
+            render();
+            if (active < lines.length) scrollToLine(active);
+
+            const offset = parsed.offsetSeconds
+                ? ` (offset ${parsed.offsetSeconds > 0 ? '+' : ''}${fmtStamp(parsed.offsetSeconds)}s applied)`
+                : '';
+            note(`Imported ${parsed.count} timed line${parsed.count === 1 ? '' : 's'} from ${file.name}${offset}.`);
+        }
+
+        function fileStem(name) {
+            return String(name || '')
+                .split(/[\\/]/).pop()
+                .replace(/\.[^.]+$/, '')
+                .toLowerCase();
+        }
+
+        // A batch import matches each .lrc to a track by file name, then writes
+        // that track's saved work. It does not touch playlist.js.
+        async function importLrcBatch(files) {
+            if (!tracks.length) {
+                note('playlist.js did not provide any tracks.', 'error');
+                return;
+            }
+
+            const byStem = new Map();
+            tracks.forEach(song => {
+                const key = fileStem(song.file);
+                if (key && !byStem.has(key)) byStem.set(key, song);
+            });
+
+            const reads = await Promise.all(files.map(async file => {
+                try {
+                    return { file, text: await file.text() };
+                } catch (error) {
+                    return { file, error };
+                }
+            }));
+
+            const matches = [];
+            const unmatched = [];
+            const untimed = [];
+            const unreadable = [];
+            const duplicates = [];
+            const used = new Set();
+
+            reads.forEach(({ file, text, error }) => {
+                if (error) {
+                    unreadable.push(file.name);
+                    return;
+                }
+                const parsed = parseLrc(text);
+                if (!parsed.count) {
+                    untimed.push(file.name);
+                    return;
+                }
+                const song = byStem.get(fileStem(file.name));
+                if (!song) {
+                    unmatched.push(file.name);
+                    return;
+                }
+                if (used.has(song.file)) {
+                    duplicates.push(file.name);
+                    return;
+                }
+                used.add(song.file);
+                matches.push({ song, parsed });
+            });
+
+            if (!matches.length) {
+                const skipped = unmatched.length ? ` Unmatched: ${unmatched.join(', ')}.` : '';
+                note(`No .lrc file matched a track by name.${skipped}`, 'error');
+                return;
+            }
+
+            const replacing = matches.filter(({ song }) => loadSaved(song)).length;
+            const summary = `Import ${matches.length} .lrc file${matches.length === 1 ? '' : 's'} into ${matches.length} track${matches.length === 1 ? '' : 's'}?`;
+            const detail = replacing
+                ? ` Saved work for ${replacing} track${replacing === 1 ? '' : 's'} will be replaced.`
+                : '';
+            if (!window.confirm(summary + detail)) return;
+
+            let currentUpdated = false;
+            matches.forEach(({ song, parsed }) => {
+                const payload = {
+                    lines: parsed.lines,
+                    times: parsed.times,
+                    active: parsed.lines.length,
+                    draft: parsed.lines.join('\n')
+                };
+                storageSet(STORE_PREFIX + song.file, JSON.stringify(payload));
+                if (track && song.file === track.file) {
+                    lines = parsed.lines;
+                    times = parsed.times;
+                    active = payload.active;
+                    linesInput.value = payload.draft;
+                    currentUpdated = true;
+                }
+            });
+
+            if (currentUpdated) render();
+
+            const skipped = [];
+            if (unmatched.length) skipped.push(`${unmatched.length} unmatched`);
+            if (untimed.length) skipped.push(`${untimed.length} without timestamps`);
+            if (unreadable.length) skipped.push(`${unreadable.length} unreadable`);
+            if (duplicates.length) skipped.push(`${duplicates.length} duplicate`);
+            const extra = skipped.length ? ` Skipped ${skipped.join(', ')}.` : '';
+            note(`Imported ${matches.length} file${matches.length === 1 ? '' : 's'} into ${matches.length} track${matches.length === 1 ? '' : 's'}.${extra}`);
+        }
+
+        importLrcBtn.addEventListener('click', () => lrcInput.click());
+        lrcInput.addEventListener('change', () => {
+            const files = Array.from(lrcInput.files || []);
+            lrcInput.value = '';
+            if (files.length === 1) importLrc(files[0]);
+            else if (files.length > 1) importLrcBatch(files);
+        });
+
+        downloadLrcBtn.addEventListener('click', () => {
+            if (!ensureExportable()) return;
+            const blob = new Blob([buildLrc()], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `lyrics-${slug(track.title || track.file)}.lrc`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            flash('Downloaded the timings as an .lrc file.');
+        });
+
+        // ---------- clipboard & download ----------
+
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (error) {
+                const helper = document.createElement('textarea');
+                helper.value = text;
+                helper.setAttribute('readonly', '');
+                helper.style.position = 'fixed';
+                helper.style.top = '0';
+                helper.style.opacity = '0';
+                document.body.appendChild(helper);
+                helper.select();
+                let ok = false;
+                try { ok = document.execCommand('copy'); } catch (copyError) { ok = false; }
+                helper.remove();
+                return ok;
+            }
+        }
+
+        function ensureExportable() {
+            const { pairs, ordered } = analyze();
+            if (!track) {
+                flash('Choose a track first.', 'bad');
+                return false;
+            }
+            if (!lines.length) {
+                flash('Paste lyrics and choose “Use these lines” first.', 'bad');
+                return false;
+            }
+            if (!pairs.length) {
+                flash('Stamp at least one line before exporting.', 'bad');
+                return false;
+            }
+            if (!ordered) {
+                flash('Fix the times so they rise with the lyric order.', 'bad');
+                return false;
+            }
+            return true;
+        }
+
+        copyLyricsBtn.addEventListener('click', async () => {
+            if (!ensureExportable()) return;
+            const ok = await copyText(lyricsBlock());
+            flash(ok ? 'Lyrics array copied. Paste it under the matching entry in playlist.js.' : 'Copy failed — select the preview text by hand.', ok ? '' : 'bad');
+        });
+
+        copyEntryBtn.addEventListener('click', async () => {
+            if (!ensureExportable()) return;
+            const ok = await copyText(entryBlock(true));
+            flash(ok ? 'Entry copied. Replace the whole entry in playlist.js with it.' : 'Copy failed — select the preview text by hand.', ok ? '' : 'bad');
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!ensureExportable()) return;
+            const text = entryBlock(true) + '\n';
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `lyrics-${slug(track.title || track.file)}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            flash('Downloaded the entry as a text file.');
+        });
+
+        // ---------- track selection ----------
+
+        function readPlaylistLyrics(forTrack) {
+            if (!Array.isArray(forTrack.lyrics)) return { lines: [], times: [] };
+            const valid = forTrack.lyrics.filter(line => line && typeof line.text === 'string' && line.text.trim());
+            return {
+                lines: valid.map(line => line.text),
+                times: valid.map(line => (Number.isFinite(line.time) ? roundTime(line.time) : null))
+            };
+        }
+
+        function selectTrack(index) {
+            if (!tracks.length) return;
+            index = Math.max(0, Math.min(tracks.length - 1, index));
+            if (track) save();
+
+            track = tracks[index];
+            trackIndex = index;
+            trackSelect.value = String(index);
+
+            const saved = loadSaved(track);
+            let source;
+            if (saved) {
+                lines = saved.lines;
+                times = saved.times;
+                active = Math.min(saved.active, lines.length);
+                linesInput.value = saved.draft;
+                source = 'saved';
+            } else {
+                const fromPlaylist = readPlaylistLyrics(track);
+                lines = fromPlaylist.lines;
+                times = fromPlaylist.times;
+                active = firstUntimed();
+                linesInput.value = lines.join('\n');
+                source = lines.length ? 'playlist' : 'empty';
+            }
+
+            audio.pause();
+            audio.src = encodeURI('music/' + track.file);
+            audio.playbackRate = Number(rateSelect.value) || 1;
+            seek.max = String(Number.isFinite(track.duration) ? track.duration : 0);
+            seek.value = '0';
+            nowEl.textContent = '0:00';
+            durEl.textContent = fmtClock(track.duration);
+            updatePlayButtons();
+            render();
+
+            if (source === 'saved') {
+                const timed = times.filter(value => value != null).length;
+                note(`Restored saved work for ${track.title} (${timed} of ${lines.length} timed).`);
+            } else if (source === 'playlist') {
+                const timed = times.filter(value => value != null).length;
+                note(timed
+                    ? `Loaded ${lines.length} lines from playlist.js with ${timed} timings. Adjust and copy when done.`
+                    : `Loaded ${lines.length} lines from playlist.js. Press Play, then Stamp each line.`);
+            } else {
+                note(`No lyrics yet for ${track.title}. Paste them below and choose “Use these lines”.`);
+            }
+
+            storageSet(LAST_TRACK, track.file);
+            try {
+                history.replaceState(null, '', `?track=${encodeURIComponent(track.file)}`);
+            } catch (error) { /* file:// may refuse this */ }
+        }
+
+        function buildTrackOptions() {
+            tracks.forEach((song, index) => {
+                const option = document.createElement('option');
+                option.value = String(index);
+                const lyricCount = Array.isArray(song.lyrics) ? song.lyrics.length : 0;
+                option.textContent = `${song.title || song.file}${lyricCount ? ` · ${lyricCount} timed` : ' · no lyrics'}`;
+                trackSelect.appendChild(option);
+            });
+            if (!tracks.length) {
+                trackSelect.disabled = true;
+                note('playlist.js did not provide any tracks.', 'error');
+            }
+        }
+
+        // ---------- events ----------
+
+        trackSelect.addEventListener('change', () => selectTrack(Number(trackSelect.value)));
+
+        playBtn.addEventListener('click', togglePlay);
+        mobilePlay.addEventListener('click', togglePlay);
+
+        stampBtn.addEventListener('click', stamp);
+        mobileStamp.addEventListener('click', stamp);
+        undoBtn.addEventListener('click', undo);
+        mobileUndo.addEventListener('click', undo);
+
+        backBtn.addEventListener('click', () => nudge(-5));
+        fwdBtn.addEventListener('click', () => nudge(5));
+
+        rateSelect.addEventListener('change', () => {
+            audio.playbackRate = Number(rateSelect.value) || 1;
+        });
+
+        seek.addEventListener('input', () => {
+            dragging = true;
+            if (Number.isFinite(audio.duration)) {
+                audio.currentTime = Math.min(Number(seek.value), audio.duration);
+                nowEl.textContent = fmtClock(audio.currentTime);
+            }
+        });
+        seek.addEventListener('change', () => {
+            dragging = false;
+            updateTimes();
+        });
+
+        applyBtn.addEventListener('click', applyLines);
+        resetBtn.addEventListener('click', resetTimings);
+
+        linesInput.addEventListener('input', () => {
+            scheduleSave();
+        });
+        linesInput.addEventListener('keydown', event => {
+            if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+                event.preventDefault();
+                applyLines();
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.metaKey || event.ctrlKey || event.altKey) return;
+            const target = event.target;
+            const typing = target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable="true"]');
+            if (typing) return;
+
+            if (event.code === 'Space') {
+                if (target instanceof HTMLButtonElement) {
+                    // Let the focused button behave normally, but avoid the page scrolling.
+                    event.preventDefault();
+                    if (target === stampBtn || target === mobileStamp) stamp();
+                    else if (target === undoBtn || target === mobileUndo) undo();
+                    else stamp();
+                } else {
+                    event.preventDefault();
+                    stamp();
+                }
+                return;
+            }
+            if (event.key === 'Backspace') {
+                event.preventDefault();
+                undo();
+                return;
+            }
+            if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                nudge(-5);
+                return;
+            }
+            if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                nudge(5);
+                return;
+            }
+            if (event.key === 'p' || event.key === 'P') {
+                event.preventDefault();
+                togglePlay();
+            }
+        });
+
+        window.addEventListener('beforeunload', save);
+
+        // ---------- start ----------
+
+        buildTrackOptions();
+
+        if (tracks.length) {
+            const params = new URLSearchParams(location.search);
+            const wanted = params.get('track');
+            let start = 0;
+            if (wanted) {
+                const needle = wanted.toLowerCase();
+                const found = tracks.findIndex(song =>
+                    song.file.toLowerCase() === needle
+                    || song.file.replace(/\.mp3$/i, '').toLowerCase() === needle
+                    || String(song.title || '').toLowerCase() === needle);
+                if (found >= 0) start = found;
+            } else {
+                const last = storageGet(LAST_TRACK);
+                const found = tracks.findIndex(song => song.file === last);
+                if (found >= 0) start = found;
+            }
+            selectTrack(start);
+        }
+
+        window.lyricsStudio = {
+            state: () => ({
+                track: track ? track.file : null,
+                trackIndex,
+                lines: lines.slice(),
+                times: times.slice(),
+                active
+            }),
+            exportEntry: () => entryBlock(true),
+            exportLyrics: () => lyricsBlock(),
+            exportLrc: () => buildLrc(),
+            parseLrc: text => parseLrc(text)
+        };
+    })();
+    </script>
+</body>
+</html>

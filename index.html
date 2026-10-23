@@ -288,6 +288,16 @@
             flex-direction: column;
             justify-content: center;
             min-height: 2.75rem;
+            overflow-wrap: anywhere;
+        }
+        .track-row > div { min-width: 0; }
+        .track-row [data-play] > div { max-width: 100%; }
+        .track-row [data-download] { position: relative; }
+        .track-row [data-download]::after { inset: 2px; }
+        @media (max-width: 359px) {
+            .track-row > div { gap: 0.15rem; padding-inline: 0.15rem; }
+            .track-row .track-duration { font-size: 0.62rem; }
+            .track-row [data-download] { min-width: 2.5rem; min-height: 2.5rem; }
         }
         .album-thumb {
             width: 2rem;
@@ -385,7 +395,11 @@
             border-top: 1px solid rgba(75, 85, 99, 0.45);
         }
         #offline-manager.visible { display: flex; }
-        #offline-summary { flex: 1 1 auto; font-size: 0.68rem; line-height: 1.3; color: #9ca3af; }
+        #offline-summary { flex: 1 1 auto; min-width: 0; font-size: 0.68rem; line-height: 1.3; color: #9ca3af; }
+        #offline-usage { display: block; margin-top: 0.2rem; color: #6b7280; font-size: 0.62rem; }
+        #offline-usage[hidden] { display: none; }
+        #offline-usage.error { color: #fbbf24; }
+        #offline-manager[aria-busy="true"] #clear-offline { opacity: 0.65; cursor: wait; }
         @media (min-width: 768px) {
             /* The desktop playlist column is narrow: stack rather than squeeze. */
             #offline-manager { flex-direction: column; align-items: stretch; }
@@ -515,10 +529,14 @@
         .spin { animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (prefers-reduced-motion: reduce) {
-            .arrow-nudge { animation: none; }
-            .lyric-line, #toast, #mobile-view-switch button { transition: none; }
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .arrow-nudge { animation: none !important; }
             .lyric-active { transform: none; }
-            .spin { animation-duration: 2.5s; }
         }
     </style>
 </head>
@@ -556,8 +574,11 @@
                 <!-- Playlist items populate here -->
             </div>
             <div id="offline-manager" role="group" aria-label="Offline storage">
-                <span id="offline-summary" aria-live="polite"></span>
-                <button id="clear-offline" type="button">Clear offline</button>
+                <div id="offline-summary" aria-live="polite">
+                    <span id="offline-track-summary"></span>
+                    <span id="offline-usage" aria-live="off"></span>
+                </div>
+                <button id="clear-offline" type="button" aria-label="Clear all downloaded audio">Clear offline</button>
             </div>
         </div>
 
@@ -1029,7 +1050,15 @@
             playlistContainer.querySelectorAll('[data-song-url]').forEach(row => {
                 if (row.dataset.songUrl !== url) return;
                 const badge = row.querySelector('[data-download]');
-                if (badge) badge.style.setProperty('--ring-progress', String(percent));
+                if (badge) {
+                    badge.style.setProperty('--ring-progress', String(percent));
+                    const song = knownTracks().find(item => songUrl(item) === url);
+                    if (song && downloadingTracks.has(url)) {
+                        const label = `Downloading ${song.title}, ${Math.round(percent)}% complete`;
+                        badge.setAttribute('aria-label', label);
+                        badge.title = label;
+                    }
+                }
             });
         }
 
@@ -1039,9 +1068,11 @@
                 idle: { icon: 'i-download', classes: 'download-idle', label: `Download ${song.title}${size} for offline listening` },
                 downloading: { icon: 'i-spinner', classes: 'download-active', label: `Downloading ${song.title}`, spin: true },
                 cached: { icon: 'i-check', classes: 'download-cached', label: `Remove ${song.title} from offline storage` },
-                error: { icon: 'i-alert', classes: '', label: `Download failed for ${song.title}` }
+                error: { icon: 'i-alert', classes: '', label: `Download failed for ${song.title}. Activate to retry.` }
             };
             const info = states[state];
+            const progress = Math.round((trackProgress.get(songUrl(song)) || 0) * 100);
+            if (state === 'downloading') info.label = `Downloading ${song.title}${progress > 0 ? `, ${progress}% complete` : ''}`;
             button.className = `icon-btn shrink-0 text-xs ${info.classes}`;
             button.style.color = state === 'error' ? '#fbbf24' : '';
             // aria-disabled keeps the control in the tab order, so focus survives
@@ -1260,7 +1291,9 @@
 
         function updateOfflineManager() {
             const manager = document.getElementById('offline-manager');
-            const summary = document.getElementById('offline-summary');
+            const summary = document.getElementById('offline-track-summary');
+            const usageSummary = document.getElementById('offline-usage');
+            const clearButton = document.getElementById('clear-offline');
             const tracks = knownTracks();
             const cached = tracks.filter(song => offlineTracks.has(songUrl(song)));
             const known = new Set(tracks.map(song => songUrl(song)));
@@ -1269,24 +1302,47 @@
             if (!cached.length && !stale.length) {
                 manager.classList.remove('visible');
                 summary.textContent = '';
-                summary.removeAttribute('title');
+                usageSummary.textContent = '';
+                usageSummary.hidden = true;
+                usageSummary.classList.remove('error');
+                clearButton.disabled = true;
+                clearButton.title = 'No downloaded audio to clear';
                 return;
             }
 
             const bytes = cached.reduce((total, song) => total + (song.bytes || 0), 0);
             const count = `${cached.length} ${cached.length === 1 ? 'track' : 'tracks'}`;
-            if (cached.length) {
-                summary.textContent = `${count} offline${bytes ? ' \u00b7 ' + formatSize(bytes) : ''}`;
-            } else {
-                summary.textContent = 'Earlier downloads are still stored';
-            }
+            summary.textContent = cached.length
+                ? `${count} saved offline${bytes ? ` · ${formatSize(bytes)} audio` : ''}`
+                : 'Earlier audio downloads are still stored';
+            clearButton.disabled = !offlineTracks.size || downloadingTracks.size > 0;
+            clearButton.title = downloadingTracks.size ? 'Wait for active downloads to finish before clearing offline audio' : 'Remove all downloaded audio from this device';
             manager.classList.add('visible');
+            updateBrowserStorageUsage(usageSummary);
+        }
 
-            if (navigator.storage && navigator.storage.estimate) {
-                navigator.storage.estimate().then(({ usage }) => {
-                    if (usage) summary.title = `This app is using ${formatSize(usage)} of browser storage`;
-                }).catch(() => {});
+        let storageEstimateRequest = 0;
+        async function updateBrowserStorageUsage(target) {
+            if (!navigator.storage || typeof navigator.storage.estimate !== 'function') {
+                target.textContent = 'Browser storage usage unavailable';
+                target.hidden = false;
+                return;
             }
+            const request = ++storageEstimateRequest;
+            try {
+                const estimate = await navigator.storage.estimate();
+                if (request !== storageEstimateRequest) return;
+                const usage = Number(estimate.usage);
+                const quota = Number(estimate.quota);
+                if (!Number.isFinite(usage)) throw new Error('Storage estimate unavailable');
+                target.textContent = `App storage: ${formatSize(usage)}${Number.isFinite(quota) && quota > 0 ? ` of ${formatSize(quota)}` : ''}`;
+                target.classList.remove('error');
+            } catch (error) {
+                if (request !== storageEstimateRequest) return;
+                target.textContent = 'Browser storage usage unavailable';
+                target.classList.add('error');
+            }
+            target.hidden = false;
         }
 
         async function removeOffline(song) {
@@ -1322,14 +1378,27 @@
         }
 
         async function clearOfflineTracks() {
-            if (!offlineTracks.size) return;
+            if (!offlineTracks.size || !('caches' in window)) return;
+            if (downloadingTracks.size) {
+                showToast('Wait for downloads to finish before clearing offline audio');
+                return;
+            }
+            const manager = document.getElementById('offline-manager');
+            const button = document.getElementById('clear-offline');
+            manager.setAttribute('aria-busy', 'true');
+            button.disabled = true;
             try {
                 await caches.delete(AUDIO_CACHE_NAME);
-            } catch (error) {}
-            offlineTracks = new Set();
-            syncOfflineMarkers();
-            updateOfflineManager();
-            showToast('Offline tracks cleared');
+                offlineTracks = new Set();
+                syncOfflineMarkers();
+                updateOfflineManager();
+                showToast('All offline audio cleared');
+            } catch (error) {
+                showToast('Could not clear offline audio');
+                updateOfflineManager();
+            } finally {
+                manager.removeAttribute('aria-busy');
+            }
         }
 
         document.getElementById('clear-offline').addEventListener('click', clearOfflineTracks);

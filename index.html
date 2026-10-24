@@ -77,8 +77,20 @@
                 -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
                 mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
             }
-            #playlist-panel { display: none; position: fixed; left: 0; right: 0; bottom: 0; height: 70%; z-index: 50; padding: 1rem; padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); background: rgba(10,10,10,0.97); border-top: 1px solid var(--accent-border); border-radius: 1.5rem 1.5rem 0 0; }
+            /* Nearly the whole card, leaving a sliver of the player visible so the
+               sheet still reads as a sheet. At 70% the header, three album tabs
+               and the search field left room for four tracks on a phone (two on
+               a 320px screen). Opaque, so the artwork and lyric text behind
+               cannot ghost through the list. */
+            #playlist-panel { display: none; position: fixed; left: 0; right: 0; bottom: 0; height: calc(100% - 4.5rem); z-index: 50; padding: 1rem; padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); background: #0b0b0b; border-top: 1px solid var(--accent-border); border-radius: 1.5rem 1.5rem 0 0; }
             #playlist-panel.open { display: flex; }
+            /* Three stacked album tabs took 165px of a phone sheet. On one line
+               each they take ~120px, and the space goes to the track list. */
+            #list-tabs { gap: 0.35rem; }
+            #list-tabs .album-tab { padding: 0.3rem 0.45rem; gap: 0.5rem; }
+            #list-tabs .album-thumb { width: 1.6rem; height: 1.6rem; }
+            #list-tabs .album-tab-title { display: inline; }
+            #list-tabs .album-tab-meta { display: inline; margin-top: 0 !important; margin-left: 0.35rem; }
         }
         #lyrics-container {
             --lyrics-size: 1.125rem;
@@ -324,6 +336,24 @@
             min-height: 2.75rem;
             overflow-wrap: anywhere;
         }
+        /* Track text is read at arm's length on a phone, so the title is near
+           white and the subtitle is a solid secondary colour rather than the
+           70%-opacity grey it used to be (~4.2:1 at 12px, under the AA bar). */
+        .track-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            line-height: 1.25;
+        }
+        .track-sub {
+            margin-top: 0.15rem;
+            font-size: 0.78rem;
+            line-height: 1.25;
+            color: #aeb6c2;
+        }
+        @media (min-width: 768px) {
+            .track-title { font-size: 0.8rem; }
+            .track-sub { font-size: 0.7rem; margin-top: 0.1rem; }
+        }
         .track-row > div { min-width: 0; }
         .track-row [data-play] > div { max-width: 100%; }
         .track-row [data-download] { position: relative; }
@@ -362,9 +392,9 @@
             border: 1px solid var(--accent-soft);
             background: rgba(0, 0, 0, 0.35);
             color: #e5e7eb;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
         }
-        #track-search::placeholder { color: #6b7280; }
+        #track-search::placeholder { color: #9aa3b0; }
         #track-search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
         /* The playlist column is narrow at tablet widths: let the badge drop
            below the heading instead of pushing it out of the column. */
@@ -406,15 +436,15 @@
         #album-download.download-active::after, [data-download].download-active::after { opacity: 1; }
         .track-duration {
             font-variant-numeric: tabular-nums;
-            font-size: 0.7rem;
-            color: #6b7280;
+            font-size: 0.72rem;
+            color: #9aa3b0;
         }
         .search-summary {
             padding: 0.15rem 0.5rem 0.4rem;
-            font-size: 0.65rem;
+            font-size: 0.68rem;
             letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: #6b7280;
+            color: #9aa3b0;
         }
         .empty-note { color: #a1a1aa; }
         #offline-manager {
@@ -430,7 +460,7 @@
         }
         #offline-manager.visible { display: flex; }
         #offline-summary { flex: 1 1 auto; min-width: 0; font-size: 0.68rem; line-height: 1.3; color: #9ca3af; }
-        #offline-usage { display: block; margin-top: 0.2rem; color: #6b7280; font-size: 0.62rem; }
+        #offline-usage { display: block; margin-top: 0.2rem; color: #9aa3b0; font-size: 0.66rem; }
         #offline-usage[hidden] { display: none; }
         #offline-usage.error { color: #fbbf24; }
         #offline-manager[aria-busy="true"] #clear-offline { opacity: 0.65; cursor: wait; }
@@ -481,13 +511,29 @@
         #quality-badge { color: var(--accent-light); }
         #install-btn { color: var(--accent-light); border-color: var(--accent-border); }
         #install-btn:hover { background: var(--accent-soft); }
+        /* Rows are cards rather than bare text on black: without a surface the
+           list read as one grey blur, especially over the artwork behind the
+           mobile sheet. */
+        .track-row {
+            background-color: rgba(255, 255, 255, 0.055);
+            border-color: rgba(255, 255, 255, 0.09);
+        }
+        .track-row:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.17);
+        }
+        .track-row .track-play { color: #e8eaed; }
+        .track-row .track-play:focus-visible { outline: 2px solid var(--accent-light); outline-offset: 1px; border-radius: 0.375rem; }
         .track-row.is-active { background-color: var(--accent-soft); border-color: var(--accent-border); }
         .track-row.is-active .track-play { color: var(--accent); }
+        .track-row.is-active .track-title { color: var(--accent-light); }
+        .track-row.is-active .track-sub { color: var(--accent-light); opacity: 0.9; }
         .album-tab { border-color: #374151; }
         .album-tab:hover { border-color: var(--accent-border); }
         .album-tab.is-active { background-color: var(--accent-soft); border-color: var(--accent-border); }
         .album-tab-title { color: #d1d5db; }
         .album-tab.is-active .album-tab-title { color: var(--accent); }
+        .album-tab-meta { font-size: 0.68rem; color: #a7afbb; }
         .download-idle { color: #6b7280; }
         .download-idle:hover { color: var(--accent); }
         .download-active { color: var(--accent-light); }
@@ -981,9 +1027,9 @@
 
             row.innerHTML = `
                 <div class="flex items-center gap-1 p-1.5 md:p-1">
-                    <button type="button" data-play class="track-play min-w-0 flex-1 text-left cursor-pointer px-1.5 py-1 text-gray-400">
-                        <div class="font-bold text-sm md:text-xs truncate">${song.title}</div>
-                        <div class="text-xs md:text-[10px] truncate opacity-70 mt-0.5">${options.subtitle}</div>
+                    <button type="button" data-play class="track-play min-w-0 flex-1 text-left cursor-pointer px-1.5 py-1">
+                        <div class="track-title truncate">${song.title}</div>
+                        <div class="track-sub truncate">${options.subtitle}</div>
                     </button>
                     <span class="track-duration shrink-0">${song.duration ? formatTime(song.duration) : ''}</span>
                     <button type="button" data-download class="icon-btn shrink-0 text-xs"></button>
@@ -2523,7 +2569,7 @@
                 title.className = 'album-tab-title block text-xs font-bold leading-tight';
                 title.textContent = album.title;
                 const meta = document.createElement('span');
-                meta.className = 'block text-[10px] text-gray-500 mt-0.5';
+                meta.className = 'album-tab-meta block mt-0.5';
                 meta.textContent = `${album.tracks.length} track${album.tracks.length === 1 ? '' : 's'}${runtimeText}`;
                 wrap.append(title, meta);
                 btn.append(thumb, wrap);

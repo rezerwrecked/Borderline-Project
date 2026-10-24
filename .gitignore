@@ -3,3 +3,5 @@
 .preview-server.pid
 .DS_Store
 Thumbs.db
+.whisper/
+.autotime/

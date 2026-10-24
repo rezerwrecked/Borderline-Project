@@ -87,6 +87,34 @@ file; it needs `ffmpeg` and `ffprobe` on `PATH`. It cannot tell which albums use
 a new image, so add newly referenced files to `SHELL_FILES` and bump
 `SHELL_CACHE` in `sw.js` afterwards.
 
+## Playlist manager
+
+The **Playlist** tab in `lyrics-editor.html` edits the library without opening the
+JavaScript files by hand. It lists every album group in player order:
+
+- **Add songs…** picks one or more audio files. The title comes from the file
+  name, the length and size are read from the audio, and the new file is added to
+  the album chosen under **Add to**. Titles, artists and lengths remain editable
+  in the row; `↑`/`↓` change album order and the album menu moves a track
+  elsewhere. Removing a track leaves its audio in `music/`.
+- **Open project folder** (Chrome or Edge, served over HTTP) links the project
+  directory once. **Save to folder** then writes `playlist.js`, replaces only the
+  `tracks` arrays in `remixes.js` — comments and other album fields survive —
+  and copies new audio into `music/`. An existing file is never overwritten: the
+  same name with a different size stops the save.
+- Without a linked folder, saving downloads `playlist.js`, `remixes.js` and any
+  new audio for you to move into the project.
+- Saving rewrites `playlist.js` in one consistent format (four-space indent,
+  CRLF line endings, double-quoted strings). Values and lyrics are preserved;
+  hand-written comments in that file are not.
+- Album entries whose files are missing from `playlist.js` are kept when saving
+  and listed under **Not in playlist.js**, where one click probes the audio and
+  creates the playlist entry.
+- Albums that use custom track objects instead of file names are left untouched
+  by a save.
+
+Saving writes locally; commit and push the project to publish the new songs.
+
 ## Lyrics
 
 Open `lyrics-editor.html`, choose a track, paste the lyrics one line per row,
@@ -110,6 +138,47 @@ node tools/apply-lyrics.js run.lrc --write           # standard LRC
 Only the target track's `lyrics` array is replaced; every other field and the
 rest of the file stay byte-for-byte unchanged. The script verifies the result
 before writing and refuses to write if any input is invalid.
+
+### Auto-timing
+
+`tools/auto-time-lyrics.js` times a track without any tapping. whisper.cpp
+listens to the recording, and each of your lines is matched to the words it
+heard, so a misheard word is skipped instead of shifting every line after it.
+
+Set it up once: put whisper.cpp's Windows release build in
+`.whisper/bin/Release/` and a ggml model in `.whisper/models/`. Both are ignored
+by git. `base.en` (148 MB) is the sensible default — `small.en` is three times
+slower, 490 MB, and measured no more accurate on these recordings.
+
+In `lyrics-editor.html`, **Auto-time…** under the lyrics box does the bookkeeping:
+it writes the lines you pasted to `.autotime/<track>.txt`, puts the command on
+the clipboard, then watches for `.autotime/<track>.lrc` and imports it as soon as
+the script finishes. Pasting that one command into a terminal is the only manual
+step; both files live in `.autotime/` and are ignored by git. It needs the
+project folder linked (Playlist tab → **Open project folder**; the button offers
+that) and Chrome or Edge.
+
+```sh
+node tools/auto-time-lyrics.js music/high.mp3 high.txt   # writes high.lrc
+node tools/apply-lyrics.js high.lrc --write              # into playlist.js
+```
+
+Lyrics go in a plain text file, one line per row; blank lines, `#` comments and
+`[Verse 1]` markers are ignored. The `.lrc` is named after the track file, so
+`apply-lyrics.js` picks it up directly, and it can also be imported into
+`lyrics-editor.html` first to nudge individual lines.
+
+Accuracy against the tracks that were already hand-timed: median error 0.5–0.9 s,
+and 37 of 55 lines within a second across `Enough`, `High` and `Reason`. The
+outliers are predictable — short lines whisper merges together ("Not that" /
+"Not that I") land a few seconds late, and when whisper decides a quiet opening
+is "(upbeat music)" the first line can be several seconds late (`High` lost its
+first two lines that way). A pass through the editor's timeline is still worth
+it. A 2–4 minute track takes roughly 10 s with `base.en` on eight threads.
+
+A track whose lyrics do not match the recording (or an instrumental) exits 1
+with "None of the … matched", and a missing binary or model exits 2 with the
+command to fix it.
 
 ## Checks
 

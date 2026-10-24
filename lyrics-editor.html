@@ -151,7 +151,7 @@
             color: var(--muted);
         }
 
-        select, textarea, input[type="number"] {
+        select, textarea, input[type="number"], input[type="text"] {
             font: inherit;
             color: var(--text);
             background: var(--panel-solid);
@@ -310,6 +310,29 @@
         }
         .row .push { margin-left: auto; }
 
+        .autoPanel {
+            margin-top: 12px;
+            padding: 11px 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(6, 20, 16, 0.55);
+        }
+        .autoPanel .note { margin-top: 0; }
+        .autoPanel .cmd {
+            margin: 9px 0 0;
+            padding: 9px 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel-solid);
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.72rem;
+            line-height: 1.55;
+            color: var(--text);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        .autoPanel .row { margin-top: 9px; }
+
         .timeline {
             list-style: none;
             margin: 0;
@@ -426,6 +449,134 @@
 
         .mobileBar { display: none; }
 
+        [hidden] { display: none !important; }
+
+        /* Section tabs */
+        .tabs {
+            display: inline-flex;
+            gap: 4px;
+            margin: -4px 0 18px;
+            padding: 4px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(6, 20, 16, 0.55);
+        }
+        .tabs button {
+            min-height: 38px;
+            padding: 7px 16px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            background: none;
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+        .tabs button:hover { background: rgba(255, 255, 255, 0.06); }
+        .tabs button[aria-selected="true"] {
+            background: rgba(52, 211, 153, 0.14);
+            border-color: var(--line-strong);
+            color: var(--accent-strong);
+            font-weight: 600;
+        }
+
+        /* Playlist manager */
+        .planner { display: grid; gap: 18px; }
+        .planner .row { margin-top: 12px; }
+        .toolbarField {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+        .toolbarField select { width: auto; min-width: 150px; min-height: 42px; }
+
+        .albumBlock {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(4, 17, 13, 0.35);
+        }
+        .albumBlock + .albumBlock { margin-top: 12px; }
+        .albumHead {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            padding: 10px 12px;
+            background: rgba(52, 211, 153, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .albumHead h3 {
+            margin: 0;
+            font-size: 0.86rem;
+            font-weight: 650;
+            color: var(--text);
+        }
+        .albumHead .albumId {
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+        .albumHead .pill { margin-left: auto; }
+
+        .plRow {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr) 4.4rem 4.4rem minmax(0, 0.9fr) auto;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 10px;
+        }
+        .plRow + .plRow { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        .plRow input[type="text"] { min-height: 38px; padding: 6px 9px; font-size: 0.86rem; width: 100%; }
+        .plRow .len { min-height: 38px; padding: 6px; font-size: 0.8rem; text-align: right; font-variant-numeric: tabular-nums; width: 100%; }
+        .plRow select { min-height: 38px; padding: 6px 8px; font-size: 0.78rem; }
+        .plCell { min-width: 0; display: grid; gap: 2px; }
+        .plFile {
+            font-size: 0.66rem;
+            color: rgba(143, 174, 159, 0.85);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .newTag {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: rgba(251, 191, 36, 0.16);
+            border: 1px solid rgba(251, 191, 36, 0.45);
+            color: var(--warn);
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .plSize {
+            font-size: 0.72rem;
+            color: var(--muted);
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .plActions { display: flex; gap: 4px; justify-content: flex-end; }
+        .plActions button { min-height: 36px; min-width: 34px; padding: 4px 7px; font-size: 0.8rem; }
+        .plActions button.remove { color: #fca5a5; }
+        .plActions button.remove:hover { background: rgba(248, 113, 113, 0.12); }
+        .plRow.orphanRow { grid-template-columns: minmax(0, 1fr) auto; }
+        .orphanName {
+            font-size: 0.88rem;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .albumNote {
+            margin: 0;
+            padding: 9px 12px;
+            font-size: 0.75rem;
+            color: var(--warn);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
         @media (max-width: 900px) {
             .grid { grid-template-columns: 1fr; }
             .topLink { display: none; }
@@ -453,6 +604,22 @@
             .mobileBar .stamp { flex: 1.7; }
         }
 
+        @media (max-width: 900px) {
+            .plRow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .plRow .plTitle,
+            .plRow .plArtist,
+            .plRow .plAlbum { grid-column: 1 / -1; }
+            .plRow .plSize { text-align: left; }
+            .plRow .plActions { grid-column: 1 / -1; justify-content: flex-start; }
+            .plActions button { min-width: 44px; min-height: 40px; }
+            body.playlist-mode .app { padding-bottom: 40px; }
+        }
+
+        @media (max-width: 900px) {
+            .plRow.orphanRow { grid-template-columns: minmax(0, 1fr) auto; }
+            .plRow.orphanRow .plTitle { grid-column: auto; }
+        }
+
         @media (max-width: 420px) {
             .tl { grid-template-columns: 1.8rem minmax(0, 1fr) 4.4rem 1.9rem; gap: 5px; }
             .panel { padding: 13px; }
@@ -475,7 +642,12 @@
             <a class="topLink" href="index.html">← Open player</a>
         </header>
 
-        <main class="grid">
+        <nav class="tabs" role="tablist" aria-label="Studio section">
+            <button type="button" role="tab" id="tabLyrics" aria-selected="true" aria-controls="panelLyrics">Lyric timing</button>
+            <button type="button" role="tab" id="tabPlaylist" aria-selected="false" aria-controls="panelPlaylist">Playlist</button>
+        </nav>
+
+        <main class="grid" id="panelLyrics" role="tabpanel" aria-labelledby="tabLyrics">
             <div class="col">
                 <section class="panel" aria-labelledby="player-title">
                     <div class="panelHead">
@@ -530,10 +702,21 @@
                     <div class="row">
                         <button type="button" id="apply" class="primary">Use these lines</button>
                         <button type="button" id="importLrc" title="Import one .lrc for this track, or several to match by file name">Import .lrc</button>
+                        <button type="button" id="autoTime" title="Time every line with whisper.cpp and import the result">Auto-time…</button>
                         <button type="button" id="reset" class="danger push">Reset timings</button>
                     </div>
                     <input type="file" id="lrcFile" accept=".lrc,text/plain" multiple hidden>
-                    <p class="hint">Applying new lines keeps timings by position, so reset first if the lyrics changed order. Importing one .lrc replaces this track's lyrics and timings; select several at once and each file is matched to a track by its file name. Everything is saved automatically.</p>
+
+                    <div class="autoPanel" id="autoPanel" hidden>
+                        <p class="note" id="autoHint"></p>
+                        <pre class="cmd" id="autoCmd" aria-label="Command to run in the project folder"></pre>
+                        <div class="row">
+                            <button type="button" id="autoCopy" class="compact">Copy command</button>
+                            <button type="button" id="autoLoad" class="compact">Load result</button>
+                            <button type="button" id="autoStop" class="compact push">Done</button>
+                        </div>
+                    </div>
+                    <p class="hint">Applying new lines keeps timings by position, so reset first if the lyrics changed order. Importing one .lrc replaces this track's lyrics and timings; select several at once and each file is matched to a track by its file name. Everything is saved automatically. “Auto-time…” hands the lines above to <code>tools/auto-time-lyrics.js</code> (whisper.cpp) and loads the result, so nothing has to be stamped by hand.</p>
                 </section>
             </div>
 
@@ -566,9 +749,46 @@
                 </section>
             </div>
         </main>
+
+        <section class="planner" id="panelPlaylist" role="tabpanel" aria-labelledby="tabPlaylist" hidden>
+            <section class="panel" aria-labelledby="plManageTitle">
+                <div class="panelHead">
+                    <h2 id="plManageTitle">Playlist</h2>
+                    <span class="pill" id="plSummary">—</span>
+                </div>
+                <p class="hint">Add songs, fix titles and artists, move a track to another album, or remove it. Saving rewrites <code>playlist.js</code>, updates the track lists in <code>remixes.js</code> and copies new audio into <code>music/</code>. Nothing changes on disk until you save.</p>
+
+                <div class="row">
+                    <button type="button" id="plAdd" class="primary">Add songs…</button>
+                    <label class="toolbarField" for="plAlbum">Add to
+                        <select id="plAlbum"></select>
+                    </label>
+                    <input type="file" id="plFiles" accept="audio/*,.mp3,.flac,.m4a,.mp4,.wav,.ogg,.opus,.aiff,.aif" multiple hidden>
+                </div>
+
+                <div class="row">
+                    <button type="button" id="plOpen">Open project folder</button>
+                    <button type="button" id="plSave" class="primary">Save changes</button>
+                    <button type="button" id="plDownload">Download updated files</button>
+                    <span class="pill push" id="plSaveState">Not saved yet</span>
+                </div>
+
+                <p class="note" id="plNote" role="status" aria-live="polite"></p>
+                <p class="hint" id="plFolderHint">Add songs, edit the list, then save. With the folder open, saving writes the audio and both playlist files in place; otherwise the same files are downloaded for you to put in the project.</p>
+            </section>
+
+            <section class="panel" aria-labelledby="plTracksTitle">
+                <div class="panelHead">
+                    <h2 id="plTracksTitle">Tracks</h2>
+                    <span class="pill" id="plCount">0</span>
+                </div>
+                <div id="plRows"></div>
+                <p class="empty" id="plEmpty" hidden>No tracks in the playlist yet. Add a song above.</p>
+            </section>
+        </section>
     </div>
 
-    <div class="mobileBar">
+    <div class="mobileBar" id="mobileBar">
         <button type="button" id="mPlay" class="primary">Play</button>
         <button type="button" id="mStamp" class="stamp">Stamp</button>
         <button type="button" id="mUndo">Undo</button>
@@ -596,15 +816,21 @@
         }
 
         const albumByFile = new Map();
-        albums.forEach(album => {
-            const title = String(album && album.title || '').trim();
-            if (!title) return;
-            (Array.isArray(album.tracks) ? album.tracks : []).forEach(entry => {
-                const file = typeof entry === 'string' ? entry : entry && entry.file;
-                const key = normalizeFile(file);
-                if (key && !albumByFile.has(key)) albumByFile.set(key, title);
+        // Rebuilt whenever the playlist manager saves, so the LRC album tag
+        // follows tracks that were moved to a different album.
+        function rebuildAlbumLookup() {
+            albumByFile.clear();
+            albums.forEach(album => {
+                const title = String(album && album.title || '').trim();
+                if (!title) return;
+                (Array.isArray(album.tracks) ? album.tracks : []).forEach(entry => {
+                    const file = typeof entry === 'string' ? entry : entry && entry.file;
+                    const key = normalizeFile(file);
+                    if (key && !albumByFile.has(key)) albumByFile.set(key, title);
+                });
             });
-        });
+        }
+        rebuildAlbumLookup();
 
         function trackAlbum(song) {
             return albumByFile.get(normalizeFile(song && song.file)) || '';
@@ -645,6 +871,13 @@
         const downloadLrcBtn = $('downloadLrc');
         const importLrcBtn = $('importLrc');
         const lrcInput = $('lrcFile');
+        const autoTimeBtn = $('autoTime');
+        const autoPanel = $('autoPanel');
+        const autoHint = $('autoHint');
+        const autoCmd = $('autoCmd');
+        const autoCopyBtn = $('autoCopy');
+        const autoLoadBtn = $('autoLoad');
+        const autoStopBtn = $('autoStop');
 
         const audio = new Audio();
         audio.preload = 'metadata';
@@ -657,6 +890,15 @@
         let dragging = false;
         let saveTimer = null;
         let statusTimer = null;
+
+        // Auto-time writes its scratch files into the project folder, next to the
+        // other tools' output, and collects the .lrc the script writes back.
+        const AUTO_DIR = '.autotime';
+        const AUTO_POLL_MS = 2000;
+        const AUTO_WAIT_MS = 5 * 60 * 1000;
+        let autoRun = null;
+        let autoPoll = null;
+        let autoDeadline = 0;
 
         // ---------- helpers ----------
 
@@ -1173,27 +1415,20 @@
             return head.join('\n') + (rows.length ? '\n\n' + rows.join('\n') : '') + '\n';
         }
 
-        async function importLrc(file) {
-            if (!track) {
-                note('Choose a track before importing lyrics.', 'warn');
-                return;
-            }
-            let text;
-            try {
-                text = await file.text();
-            } catch (error) {
-                note(`Could not read ${file.name}.`, 'error');
-                return;
-            }
-
+        // Replaces this track's lines and timings with a parsed .lrc. Returns the
+        // parsed result when it is applied, or null when the user said no.
+        async function applyLrcText(text, label, options) {
             const parsed = parseLrc(text);
             if (!parsed.count) {
-                note(`${file.name} has no [mm:ss] timestamps to import.`, 'warn');
-                return;
+                note(`${label} has no [mm:ss] timestamps to import.`, 'warn');
+                return null;
             }
 
             const hasWork = lines.length > 0 || times.some(value => value != null);
-            if (hasWork && !window.confirm(`Replace the current lyrics and timings for “${track.title}” with ${file.name}?`)) return;
+            const ask = !options || options.ask !== false;
+            if (ask && hasWork && !window.confirm(`Replace the current lyrics and timings for “${track ? track.title : 'this track'}” with ${label}?`)) {
+                return null;
+            }
 
             lines = parsed.lines;
             times = parsed.times;
@@ -1206,7 +1441,203 @@
             const offset = parsed.offsetSeconds
                 ? ` (offset ${parsed.offsetSeconds > 0 ? '+' : ''}${fmtStamp(parsed.offsetSeconds)}s applied)`
                 : '';
-            note(`Imported ${parsed.count} timed line${parsed.count === 1 ? '' : 's'} from ${file.name}${offset}.`);
+            note(`Imported ${parsed.count} timed line${parsed.count === 1 ? '' : 's'} from ${label}${offset}.`);
+            return parsed;
+        }
+
+        async function importLrc(file) {
+            if (!track) {
+                note('Choose a track before importing lyrics.', 'warn');
+                return;
+            }
+            let text;
+            try {
+                text = await file.text();
+            } catch (error) {
+                note(`Could not read ${file.name}.`, 'error');
+                return;
+            }
+            await applyLrcText(text, file.name);
+        }
+
+        // ---------- auto-time ----------
+
+        // The project folder is linked in the Playlist tab, so these scratch files
+        // go through that tab's handle rather than asking for a second one.
+        function autoApi() {
+            const api = window.playlistManager && window.playlistManager.autoTime;
+            return api && typeof api.write === 'function' ? api : null;
+        }
+
+        function autoSay(text, tone) {
+            autoHint.textContent = text || '';
+            autoHint.className = 'note' + (tone ? ' ' + tone : '');
+        }
+
+        function autoStem() {
+            return String((track && track.file) || '')
+                .replace(/\\/g, '/')
+                .split('/').pop()
+                .replace(/\.[^.]*$/, '');
+        }
+
+        // Mirrors the script's own reader: blank rows, [Section] markers and
+        // # comments are structure, not lyrics.
+        function autoLyrics() {
+            return linesInput.value
+                .split(/\r?\n/)
+                .map(line => line.trim())
+                .filter(line => line && !/^\[[^\]]*\]$/.test(line) && !/^#/.test(line));
+        }
+
+        function stopAutoTime() {
+            clearInterval(autoPoll);
+            autoPoll = null;
+            autoRun = null;
+            autoTimeBtn.textContent = 'Auto-time…';
+        }
+
+        async function startAutoTime() {
+            if (!track) {
+                note('Choose a track first.', 'warn');
+                return;
+            }
+            const api = autoApi();
+            if (!api) {
+                note('Auto-time is not available on this page.', 'error');
+                return;
+            }
+            if (!autoLyrics().length) {
+                note('Paste the lyrics above, then press Auto-time.', 'warn');
+                linesInput.focus();
+                return;
+            }
+
+            // The script reads a file and writes one, so it needs the folder that
+            // holds music/: offer to link it right here instead of sending the
+            // user to the other tab.
+            if (!api.linked()) {
+                if (!window.showDirectoryPicker) {
+                    note('Auto-time writes into the project folder, which this browser cannot link. Use Chrome or Edge, or run the command by hand.', 'warn');
+                    return;
+                }
+                note('Choose the project folder once so Auto-time can write the lyrics and read the result back.', 'warn');
+                if (!(await api.link())) {
+                    note('No folder was linked, so nothing was written. Choose the project folder, or run the command by hand.', 'warn');
+                    return;
+                }
+            }
+
+            const lyricLines = autoLyrics();
+            if (!lyricLines.length) {
+                note('Paste the lyrics above, then press Auto-time.', 'warn');
+                return;
+            }
+
+            const timed = times.filter(value => value != null).length;
+            if (timed && !window.confirm(`Auto-time ${lyricLines.length} lines for “${track.title}”? The ${timed} timing${timed === 1 ? '' : 's'} here are replaced as soon as the result loads.`)) return;
+
+            stopAutoTime();
+
+            const stem = autoStem();
+            const file = String(track.file || '').replace(/\\/g, '/').replace(/^music\//i, '');
+            const lyricsName = `${stem}.txt`;
+            const lrcName = `${stem}.lrc`;
+            const command = `node tools/auto-time-lyrics.js "music/${file}" "${AUTO_DIR}/${lyricsName}" --out "${AUTO_DIR}/${lrcName}"`;
+
+            autoPanel.hidden = false;
+            autoCmd.textContent = command;
+            autoTimeBtn.textContent = 'Waiting…';
+            autoRun = { stem, startedAt: Date.now(), checking: false };
+
+            try {
+                await api.write(lyricsName, lyricLines.join('\n') + '\n');
+            } catch (error) {
+                autoPanel.hidden = true;
+                stopAutoTime();
+                note(`Could not write ${AUTO_DIR}/${lyricsName}: ${error && error.message ? error.message : 'unknown error'}.`, 'error');
+                return;
+            }
+
+            const copied = await copyText(command);
+            autoSay(copied
+                ? `Saved these ${lyricLines.length} lines to ${AUTO_DIR}/${lyricsName} and copied the command. Paste it into a terminal in the project folder; this page imports ${AUTO_DIR}/${lrcName} as soon as it appears.`
+                : `Saved these ${lyricLines.length} lines to ${AUTO_DIR}/${lyricsName}. Copy the command above, run it in the project folder, and this page imports ${AUTO_DIR}/${lrcName} by itself.`);
+            startAutoPoll();
+        }
+
+        function startAutoPoll() {
+            clearInterval(autoPoll);
+            autoDeadline = Date.now() + AUTO_WAIT_MS;
+            autoPoll = setInterval(checkAutoTime, AUTO_POLL_MS);
+            checkAutoTime();
+        }
+
+        // Looking in the folder is cheap, so the page just watches for the .lrc
+        // instead of asking the user to import it by hand.
+        async function checkAutoTime() {
+            const run = autoRun;
+            const api = autoApi();
+            if (!run || !api) return;
+
+            if (Date.now() > autoDeadline) {
+                stopAutoTime();
+                autoSay(`Nothing appeared at ${AUTO_DIR}/${run.stem}.lrc in five minutes. Run the command, then press “Load result”.`, 'warn');
+                return;
+            }
+            if (run.checking) return;
+            run.checking = true;
+            let result = null;
+            try {
+                result = await api.read(`${run.stem}.lrc`);
+            } catch (error) {
+                result = null;
+            } finally {
+                run.checking = false;
+            }
+            if (!result || autoRun !== run) return;
+            // A file left from an earlier run is not this run's result.
+            if (Number.isFinite(result.lastModified) && result.lastModified < run.startedAt - 2000) return;
+
+            stopAutoTime();
+            const parsed = await applyLrcText(result.text, `${AUTO_DIR}/${run.stem}.lrc`, { ask: false });
+            if (!parsed) {
+                autoSay(`${AUTO_DIR}/${run.stem}.lrc could not be applied. Open it with “Import .lrc” to see why.`, 'error');
+                return;
+            }
+            autoSay(`Auto-timed ${parsed.count} line${parsed.count === 1 ? '' : 's'} from ${AUTO_DIR}/${run.stem}.lrc. Nudge any line that landed late, then copy the entry as usual.`);
+            flash(`Auto-timed ${parsed.count} lines.`);
+        }
+
+        async function loadAutoTimeResult() {
+            if (!track) {
+                note('Choose a track first.', 'warn');
+                return;
+            }
+            const api = autoApi();
+            if (!api || !api.linked()) {
+                note('Link the project folder to load the result.', 'warn');
+                return;
+            }
+
+            const run = autoRun;
+            const stem = run ? run.stem : autoStem();
+            let result = null;
+            try {
+                result = await api.read(`${stem}.lrc`);
+            } catch (error) {
+                result = null;
+            }
+            if (!result) {
+                autoSay(`No ${AUTO_DIR}/${stem}.lrc yet. Run the command above in the project folder.`, 'warn');
+                return;
+            }
+
+            // A run that already asked is not asked again.
+            const parsed = await applyLrcText(result.text, `${AUTO_DIR}/${stem}.lrc`, { ask: !run });
+            if (!parsed) return;
+            stopAutoTime();
+            autoSay(`Auto-timed ${parsed.count} line${parsed.count === 1 ? '' : 's'} from ${AUTO_DIR}/${stem}.lrc.`);
         }
 
         function fileStem(name) {
@@ -1310,6 +1741,22 @@
             note(`Imported ${matches.length} file${matches.length === 1 ? '' : 's'} into ${matches.length} track${matches.length === 1 ? '' : 's'}.${extra}`);
         }
 
+        autoTimeBtn.addEventListener('click', startAutoTime);
+        autoCopyBtn.addEventListener('click', async () => {
+            const command = autoCmd.textContent;
+            if (!command) return;
+            const copied = await copyText(command);
+            autoSay(
+                copied ? 'Command copied.' : 'Could not copy automatically. Select the command above and copy it.',
+                copied ? undefined : 'warn'
+            );
+        });
+        autoLoadBtn.addEventListener('click', loadAutoTimeResult);
+        autoStopBtn.addEventListener('click', () => {
+            stopAutoTime();
+            autoSay('Stopped waiting. “Auto-time…” starts a new run.');
+        });
+
         importLrcBtn.addEventListener('click', () => lrcInput.click());
         lrcInput.addEventListener('change', () => {
             const files = Array.from(lrcInput.files || []);
@@ -1324,7 +1771,10 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `lyrics-${slug(track.title || track.file)}.lrc`;
+            // Named after the track file so tools/apply-lyrics.js, which matches
+            // an .lrc to a track by file name, can take it as-is.
+            const stem = String(track.file || '').replace(/\\/g, '/').split('/').pop().replace(/\.[^.]*$/, '');
+            link.download = `${stem || slug(track.title || 'lyrics')}.lrc`;
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -1416,6 +1866,12 @@
         function selectTrack(index) {
             if (!tracks.length) return;
             index = Math.max(0, Math.min(tracks.length - 1, index));
+            // Waiting for another track's .lrc must not land on this one.
+            if (autoRun) {
+                stopAutoTime();
+                autoPanel.hidden = true;
+                autoCmd.textContent = '';
+            }
             if (track) save();
 
             track = tracks[index];
@@ -1481,6 +1937,42 @@
             }
         }
 
+        // Called by the playlist manager after it writes playlist.js and
+        // remixes.js, so the timing view reflects the saved library without a
+        // reload. Drafts saved for removed tracks stay in localStorage.
+        function setLibrary(nextTracks, nextAlbums) {
+            if (track) save();
+            if (Array.isArray(nextAlbums)) {
+                albums.length = 0;
+                nextAlbums.forEach(album => albums.push(album));
+                rebuildAlbumLookup();
+            }
+            tracks.length = 0;
+            (Array.isArray(nextTracks) ? nextTracks : []).forEach(song => tracks.push(song));
+
+            trackSelect.innerHTML = '';
+            trackSelect.disabled = !tracks.length;
+            buildTrackOptions();
+
+            if (!tracks.length) {
+                track = null;
+                lines = [];
+                times = [];
+                active = 0;
+                linesInput.value = '';
+                audio.pause();
+                audio.removeAttribute('src');
+                render();
+                note('The playlist has no tracks yet.', 'warn');
+                return;
+            }
+
+            const previous = track;
+            const index = previous ? tracks.findIndex(song => song.file === previous.file) : 0;
+            track = null;
+            selectTrack(index >= 0 ? index : 0);
+        }
+
         // ---------- events ----------
 
         trackSelect.addEventListener('change', () => selectTrack(Number(trackSelect.value)));
@@ -1527,17 +2019,25 @@
 
         document.addEventListener('keydown', event => {
             if (event.metaKey || event.ctrlKey || event.altKey) return;
+            // The Playlist tab has its own controls; stamping and nudging must not
+            // steal Space or the arrow keys there.
+            if (document.body.classList.contains('playlist-mode')) return;
             const target = event.target;
             const typing = target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable="true"]');
             if (typing) return;
 
             if (event.code === 'Space') {
                 if (target instanceof HTMLButtonElement) {
-                    // Let the focused button behave normally, but avoid the page scrolling.
-                    event.preventDefault();
-                    if (target === stampBtn || target === mobileStamp) stamp();
-                    else if (target === undoBtn || target === mobileUndo) undo();
-                    else stamp();
+                    // Every other button keeps its own Space activation, so the
+                    // stamp shortcut only takes the key when nothing is focused
+                    // on a control.
+                    if (target === stampBtn || target === mobileStamp) {
+                        event.preventDefault();
+                        stamp();
+                    } else if (target === undoBtn || target === mobileUndo) {
+                        event.preventDefault();
+                        undo();
+                    }
                 } else {
                     event.preventDefault();
                     stamp();
@@ -1601,7 +2101,1267 @@
             exportEntry: () => entryBlock(true),
             exportLyrics: () => lyricsBlock(),
             exportLrc: () => buildLrc(),
-            parseLrc: text => parseLrc(text)
+            parseLrc: text => parseLrc(text),
+            setLibrary: (nextTracks, nextAlbums) => setLibrary(nextTracks, nextAlbums)
+        };
+    })();
+    </script>
+
+    <script>
+    // Playlist manager: add songs, edit titles and artists, move tracks between
+    // albums and write the result back to playlist.js and remixes.js. With the
+    // project folder linked (File System Access API) it also copies new audio
+    // into music/; otherwise it downloads the files to be moved by hand.
+    (() => {
+        'use strict';
+
+        const $ = id => document.getElementById(id);
+        const DEFAULT_ARTIST = 'Borderline';
+        const AUDIO_NAME = /\.(mp3|flac|m4a|mp4|aac|wav|ogg|opus|aiff?|wma)$/i;
+
+        const state = {
+            songs: [],
+            albums: [],
+            dirty: false,
+            busy: false,
+            savedOnce: false,
+            dirHandle: null,
+            baseline: { playlist: '', remixes: '' },
+            remixesSource: null,
+            orphans: [],
+            eol: '\r\n'
+        };
+
+        const tabLyrics = $('tabLyrics');
+        const tabPlaylist = $('tabPlaylist');
+        const panelLyrics = $('panelLyrics');
+        const panelPlaylist = $('panelPlaylist');
+        const mobileBar = $('mobileBar');
+        const plRows = $('plRows');
+        const plEmpty = $('plEmpty');
+        const plSummary = $('plSummary');
+        const plCount = $('plCount');
+        const plAdd = $('plAdd');
+        const plAlbum = $('plAlbum');
+        const plFiles = $('plFiles');
+        const plOpen = $('plOpen');
+        const plSave = $('plSave');
+        const plDownload = $('plDownload');
+        const plSaveState = $('plSaveState');
+        const plNote = $('plNote');
+        const plFolderHint = $('plFolderHint');
+
+        // ---------- helpers ----------
+
+        function normalize(file) {
+            return String(file || '')
+                .replace(/\\/g, '/')
+                .replace(/^\.?\//, '')
+                .replace(/^music\//i, '')
+                .toLowerCase();
+        }
+
+        function slugify(value) {
+            return String(value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        }
+
+        function quoteSingle(value) {
+            return "'" + String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ') + "'";
+        }
+
+        function formatBytes(bytes) {
+            const value = Number(bytes);
+            if (!Number.isFinite(value) || value <= 0) return '—';
+            if (value >= 1073741824) return `${(value / 1073741824).toFixed(1)} GB`;
+            if (value >= 1048576) return `${(value / 1048576).toFixed(1)} MB`;
+            return `${Math.max(1, Math.round(value / 1024))} KB`;
+        }
+
+        function formatLength(seconds) {
+            const total = Math.max(0, Math.round(Number(seconds) || 0));
+            return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+        }
+
+        function parseLength(text) {
+            const value = String(text || '').trim();
+            const clock = /^(\d{1,3}):([0-5]?\d)$/.exec(value);
+            if (clock) return Number(clock[1]) * 60 + Number(clock[2]);
+            if (/^\d{1,5}$/.test(value)) return Number(value);
+            return null;
+        }
+
+        function formatTotal(seconds) {
+            const total = Math.max(0, Math.round(Number(seconds) || 0));
+            if (total < 3600) return `${Math.max(1, Math.round(total / 60))} min`;
+            return `${Math.floor(total / 3600)} hr ${Math.round((total % 3600) / 60)} min`;
+        }
+
+        function titleFromFile(name) {
+            const base = String(name || '')
+                .replace(/\.[^.]+$/, '')
+                .replace(/_+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            const cleaned = base.replace(/^\d{1,3}\s*[-–.]\s*/, '') || base;
+            return cleaned.replace(/(^|\s)([a-z])/g, (match, space, letter) => space + letter.toUpperCase());
+        }
+
+        function safeFileName(name) {
+            return String(name || '')
+                .split(/[\\/]/).pop()
+                .replace(/[\u0000-\u001f<>:"|?*]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function flash(text, tone) {
+            plNote.textContent = text || '';
+            plNote.className = 'note' + (tone ? ' ' + tone : '');
+        }
+
+        // ---------- state ----------
+
+        function cloneLyrics(list) {
+            if (!Array.isArray(list)) return [];
+            return list
+                .filter(line => line && typeof line.text === 'string' && line.text.trim() !== '')
+                .map(line => ({
+                    time: Number.isFinite(Number(line.time)) ? Math.round(Number(line.time) * 10) / 10 : 0,
+                    text: String(line.text)
+                }));
+        }
+
+        function loadAlbums(source) {
+            const list = Array.isArray(source) ? source : [];
+            return list.map((config, index) => {
+                const title = String(config && config.title || '').trim();
+                const id = String(config && config.id || slugify(title) || `album-${index + 1}`).trim();
+                const entries = Array.isArray(config && config.tracks) ? config.tracks : [];
+                return {
+                    id: id || `album-${index + 1}`,
+                    title: title || id || `Album ${index + 1}`,
+                    config: config || {},
+                    hasObjectTracks: entries.some(entry => entry && typeof entry === 'object')
+                };
+            });
+        }
+
+        // The album lists are the playback order, so start from them instead of
+        // the raw playlist order. Anything not in an album follows at the end,
+        // unassigned; saving then leaves untouched albums exactly as they were.
+        function loadLibrary(rawTracks, rawAlbums) {
+            state.albums = loadAlbums(rawAlbums);
+            const source = Array.isArray(rawTracks) ? rawTracks : [];
+
+            const byKey = new Map();
+            const songs = source.map(song => ({
+                title: String(song && song.title || ''),
+                artist: String(song && song.artist || DEFAULT_ARTIST),
+                file: String(song && song.file || ''),
+                duration: Math.round(Number(song && song.duration) || 0),
+                bytes: Math.round(Number(song && song.bytes) || 0),
+                lyrics: cloneLyrics(song && song.lyrics),
+                albumId: '',
+                source: 'existing',
+                blob: null
+            }));
+            songs.forEach(song => {
+                const key = normalize(song.file);
+                if (key && !byKey.has(key)) byKey.set(key, song);
+            });
+
+            const used = new Set();
+            const ordered = [];
+            state.albums.forEach(album => {
+                const entries = Array.isArray(album.config.tracks) ? album.config.tracks : [];
+                entries.forEach(entry => {
+                    const key = normalize(typeof entry === 'string' ? entry : entry && entry.file);
+                    const song = byKey.get(key);
+                    if (!song || used.has(song)) return;
+                    song.albumId = album.id;
+                    used.add(song);
+                    ordered.push(song);
+                });
+            });
+            songs.forEach(song => {
+                if (used.has(song)) return;
+                used.add(song);
+                ordered.push(song);
+            });
+
+            state.songs = ordered;
+
+            // Files listed in an album but missing from playlist.js are kept in
+            // the album when saving, and offered for adding rather than dropped.
+            const known = new Set(ordered.map(song => normalize(song.file)));
+            state.orphans = [];
+            state.albums.forEach(album => {
+                album.preserved = [];
+                const entries = Array.isArray(album.config.tracks) ? album.config.tracks : [];
+                entries.forEach(entry => {
+                    if (typeof entry !== 'string') return;
+                    const key = normalize(entry);
+                    if (!key) return;
+                    const file = String(entry).replace(/^\.?\/?music\//i, '');
+                    const song = byKey.get(key);
+                    if (song) {
+                        // A track that is already owned by another album keeps this
+                        // extra membership when the album is rewritten.
+                        if (song.albumId !== album.id) album.preserved.push(file);
+                        return;
+                    }
+                    if (known.has(key)) return;
+                    known.add(key);
+                    album.preserved.push(file);
+                    state.orphans.push({ file, albumId: album.id });
+                });
+            });
+
+            state.dirty = false;
+        }
+
+        // ---------- derived lists ----------
+
+        function songsForAlbum(albumId) {
+            return state.songs.filter(song => song.albumId === albumId);
+        }
+
+        // Everything an album should list: its managed tracks first, then files
+        // kept as they were, without duplicates.
+        function albumFileList(album) {
+            const seen = new Set();
+            const files = [];
+            songsForAlbum(album.id).map(song => song.file).concat(album.preserved || []).forEach(file => {
+                const key = normalize(file);
+                if (!key || seen.has(key)) return;
+                seen.add(key);
+                files.push(file);
+            });
+            return files;
+        }
+
+        function unassignedSongs() {
+            const ids = new Set(state.albums.map(album => album.id));
+            return state.songs.filter(song => !ids.has(song.albumId));
+        }
+
+        function groups() {
+            const list = state.albums.map(album => ({ album, songs: songsForAlbum(album.id) }));
+            const rest = unassignedSongs();
+            if (rest.length) list.push({ album: null, songs: rest });
+            return list;
+        }
+
+        function orderedSongs() {
+            const ids = new Set(state.albums.map(album => album.id));
+            const grouped = [];
+            state.albums.forEach(album => {
+                state.songs.forEach(song => {
+                    if (song.albumId === album.id) grouped.push(song);
+                });
+            });
+            state.songs.forEach(song => {
+                if (!ids.has(song.albumId)) grouped.push(song);
+            });
+            return grouped;
+        }
+
+        function songsInGroup(song) {
+            const ids = new Set(state.albums.map(album => album.id));
+            const albumId = ids.has(song.albumId) ? song.albumId : '';
+            return state.songs.filter(candidate => {
+                const candidateId = ids.has(candidate.albumId) ? candidate.albumId : '';
+                return candidateId === albumId;
+            });
+        }
+
+        // ---------- rendering ----------
+
+        function markDirty() {
+            if (state.dirty) return;
+            state.dirty = true;
+            renderSaveState();
+        }
+
+        function renderSaveState() {
+            let label;
+            if (state.busy) label = 'Working…';
+            else if (state.dirty) label = 'Unsaved changes';
+            else if (state.savedOnce) label = 'Saved';
+            else label = 'No changes yet';
+            plSaveState.textContent = `${label} · ${state.dirHandle ? 'folder linked' : 'download mode'}`;
+            plSave.disabled = state.busy;
+            plDownload.disabled = state.busy;
+            plAdd.disabled = state.busy;
+            plOpen.disabled = state.busy;
+            plSave.textContent = state.dirHandle ? 'Save to folder' : 'Save (download)';
+        }
+
+        function iconButton(label, description, onClick, extra) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = extra || '';
+            button.textContent = label;
+            button.title = description;
+            button.setAttribute('aria-label', description);
+            button.addEventListener('click', onClick);
+            return button;
+        }
+
+        function renderRow(song, group, position) {
+            const row = document.createElement('div');
+            row.className = 'plRow';
+
+            const titleCell = document.createElement('div');
+            titleCell.className = 'plCell plTitle';
+            const title = document.createElement('input');
+            title.type = 'text';
+            title.value = song.title;
+            title.placeholder = 'Title';
+            title.setAttribute('aria-label', `Title for ${song.file || 'this track'}`);
+            title.addEventListener('input', () => {
+                song.title = title.value;
+                markDirty();
+            });
+
+            const fileLine = document.createElement('span');
+            fileLine.className = 'plFile';
+            fileLine.textContent = `music/${song.file}`;
+            if (song.source === 'new') {
+                const tag = document.createElement('span');
+                tag.className = 'newTag';
+                tag.textContent = 'new';
+                fileLine.appendChild(tag);
+            }
+            titleCell.append(title, fileLine);
+
+            const artist = document.createElement('input');
+            artist.type = 'text';
+            artist.className = 'plArtist';
+            artist.value = song.artist;
+            artist.placeholder = 'Artist';
+            artist.setAttribute('aria-label', `Artist for ${song.title || song.file}`);
+            artist.addEventListener('input', () => {
+                song.artist = artist.value;
+                markDirty();
+            });
+
+            const length = document.createElement('input');
+            length.type = 'text';
+            length.className = 'len';
+            length.value = formatLength(song.duration);
+            length.inputMode = 'numeric';
+            length.setAttribute('aria-label', `Length of ${song.title || song.file}, in minutes and seconds`);
+            length.addEventListener('change', () => {
+                const seconds = parseLength(length.value);
+                if (seconds == null || seconds <= 0) {
+                    length.value = formatLength(song.duration);
+                    flash('Use minutes:seconds for the length, for example 3:05.', 'bad');
+                    return;
+                }
+                song.duration = seconds;
+                length.value = formatLength(seconds);
+                markDirty();
+            });
+
+            const size = document.createElement('span');
+            size.className = 'plSize';
+            size.textContent = formatBytes(song.bytes);
+            size.title = `${Number(song.bytes || 0).toLocaleString()} bytes`;
+
+            const album = document.createElement('select');
+            album.className = 'plAlbum';
+            album.setAttribute('aria-label', `Album for ${song.title || song.file}`);
+            state.albums.forEach(candidate => {
+                const option = document.createElement('option');
+                option.value = candidate.id;
+                option.textContent = candidate.title;
+                album.appendChild(option);
+            });
+            const none = document.createElement('option');
+            none.value = '';
+            none.textContent = 'No album (hidden)';
+            album.appendChild(none);
+            album.value = group.album ? group.album.id : '';
+            album.addEventListener('change', () => moveToAlbum(song, album.value));
+
+            const actions = document.createElement('div');
+            actions.className = 'plActions';
+            const up = iconButton('↑', `Move ${song.title || song.file} up`, () => moveWithin(song, -1));
+            up.disabled = position === 0;
+            const down = iconButton('↓', `Move ${song.title || song.file} down`, () => moveWithin(song, 1));
+            down.disabled = position === group.songs.length - 1;
+            const remove = iconButton('✕', `Remove ${song.title || song.file} from the playlist`, () => removeSong(song), 'remove');
+            actions.append(up, down, remove);
+
+            row.append(titleCell, artist, length, size, album, actions);
+            return row;
+        }
+
+        function renderGroup(group) {
+            const block = document.createElement('section');
+            block.className = 'albumBlock';
+
+            const head = document.createElement('div');
+            head.className = 'albumHead';
+            const title = document.createElement('h3');
+            title.textContent = group.album ? group.album.title : 'No album';
+            const id = document.createElement('span');
+            id.className = 'albumId';
+            id.textContent = group.album ? group.album.id : 'hidden from the player';
+            const count = document.createElement('span');
+            count.className = 'pill';
+            count.textContent = `${group.songs.length} · ${formatTotal(group.songs.reduce((sum, song) => sum + (Number(song.duration) || 0), 0))}`;
+            head.append(title, id, count);
+            block.appendChild(head);
+
+            if (!group.album) {
+                const warning = document.createElement('p');
+                warning.className = 'albumNote';
+                warning.textContent = 'Tracks with no album do not appear in the player. Choose an album for each one.';
+                block.appendChild(warning);
+            } else if (group.album.hasObjectTracks) {
+                const warning = document.createElement('p');
+                warning.className = 'albumNote';
+                warning.textContent = 'This album also lists custom track entries in remixes.js, so its track list is left unchanged when saving.';
+                block.appendChild(warning);
+            }
+
+            group.songs.forEach((song, index) => block.appendChild(renderRow(song, group, index)));
+            return block;
+        }
+
+        function renderOrphans() {
+            const block = document.createElement('section');
+            block.className = 'albumBlock';
+            const head = document.createElement('div');
+            head.className = 'albumHead';
+            const title = document.createElement('h3');
+            title.textContent = 'Not in playlist.js';
+            const note = document.createElement('span');
+            note.className = 'albumId';
+            note.textContent = 'listed in an album only';
+            const count = document.createElement('span');
+            count.className = 'pill';
+            count.textContent = `${state.orphans.length}`;
+            head.append(title, note, count);
+            block.appendChild(head);
+
+            const warning = document.createElement('p');
+            warning.className = 'albumNote';
+            warning.textContent = 'These album tracks have no playlist entry yet, so the player skips them. Add one to give the file a title, length and lyrics.';
+            block.appendChild(warning);
+
+            state.orphans.forEach(orphan => {
+                const row = document.createElement('div');
+                row.className = 'plRow orphanRow';
+                const cell = document.createElement('div');
+                cell.className = 'plCell plTitle';
+                const name = document.createElement('span');
+                name.className = 'orphanName';
+                name.textContent = orphan.file;
+                const album = document.createElement('span');
+                album.className = 'plFile';
+                const owner = state.albums.find(candidate => candidate.id === orphan.albumId);
+                album.textContent = owner ? owner.title : 'No album';
+                cell.append(name, album);
+
+                const action = document.createElement('button');
+                action.type = 'button';
+                action.className = 'compact';
+                action.textContent = 'Add to playlist';
+                action.setAttribute('aria-label', `Add ${orphan.file} to the playlist`);
+                action.addEventListener('click', () => addOrphan(orphan));
+
+                row.append(cell, action);
+                block.appendChild(row);
+            });
+            return block;
+        }
+
+        function render() {
+            plRows.innerHTML = '';
+            groups().forEach(group => plRows.appendChild(renderGroup(group)));
+            if (state.orphans.length) plRows.appendChild(renderOrphans());
+            plEmpty.hidden = state.songs.length > 0;
+            plCount.textContent = `${state.songs.length} track${state.songs.length === 1 ? '' : 's'}`;
+
+            const runtime = state.songs.reduce((sum, song) => sum + (Number(song.duration) || 0), 0);
+            const bytes = state.songs.reduce((sum, song) => sum + (Number(song.bytes) || 0), 0);
+            plSummary.textContent = state.songs.length ? `${formatTotal(runtime)} · ${formatBytes(bytes)}` : 'Empty';
+
+            const chosen = plAlbum.value;
+            plAlbum.innerHTML = '';
+            state.albums.forEach(album => {
+                const option = document.createElement('option');
+                option.value = album.id;
+                option.textContent = album.title;
+                plAlbum.appendChild(option);
+            });
+            if (chosen && state.albums.some(album => album.id === chosen)) plAlbum.value = chosen;
+            else if (state.albums.length) plAlbum.value = state.albums[0].id;
+            plAlbum.disabled = !state.albums.length;
+
+            renderSaveState();
+        }
+
+        // ---------- editing ----------
+
+        function moveWithin(song, direction) {
+            const group = songsInGroup(song);
+            const position = group.indexOf(song);
+            const other = group[position + direction];
+            if (!other) return;
+            const from = state.songs.indexOf(song);
+            const to = state.songs.indexOf(other);
+            state.songs[from] = other;
+            state.songs[to] = song;
+            markDirty();
+            render();
+        }
+
+        function moveToAlbum(song, albumId) {
+            song.albumId = albumId;
+            const index = state.songs.indexOf(song);
+            if (index >= 0) state.songs.splice(index, 1);
+            let insertAt = -1;
+            state.songs.forEach((candidate, position) => {
+                if (candidate.albumId === albumId) insertAt = position;
+            });
+            state.songs.splice(insertAt >= 0 ? insertAt + 1 : state.songs.length, 0, song);
+            markDirty();
+            render();
+        }
+
+        function removeSong(song) {
+            const label = song.title || song.file;
+            if (!window.confirm(`Remove “${label}” from the playlist? The audio file stays in music/.`)) return;
+            state.songs = state.songs.filter(candidate => candidate !== song);
+            markDirty();
+            render();
+            flash(`Removed ${label}. Save to write the change.`);
+        }
+
+        // Length and size of audio that is already in music/ (an album entry that
+        // has no playlist entry yet).
+        async function probeAudio(file) {
+            const url = encodeURI('music/' + file);
+            let bytes = 0;
+            try {
+                const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+                if (response.ok) bytes = Number(response.headers.get('Content-Length')) || 0;
+            } catch (error) { /* the length can still be typed by hand */ }
+            const duration = await new Promise(resolve => {
+                const probe = new Audio();
+                let settled = false;
+                const finish = seconds => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    probe.removeAttribute('src');
+                    resolve(Number.isFinite(seconds) && seconds > 0 ? Math.round(seconds) : 0);
+                };
+                const timer = setTimeout(() => finish(0), 20000);
+                probe.preload = 'metadata';
+                probe.addEventListener('loadedmetadata', () => finish(probe.duration), { once: true });
+                probe.addEventListener('error', () => finish(0), { once: true });
+                probe.src = url;
+            });
+            return { bytes: Math.round(bytes), duration };
+        }
+
+        async function addOrphan(orphan) {
+            if (state.busy) return;
+            setBusy(true, `Reading music/${orphan.file}…`);
+            let info = { bytes: 0, duration: 0 };
+            try {
+                info = await probeAudio(orphan.file);
+            } finally {
+                setBusy(false);
+            }
+            state.orphans = state.orphans.filter(item => item !== orphan);
+            const album = state.albums.find(candidate => candidate.id === orphan.albumId);
+            if (album) album.preserved = album.preserved.filter(file => normalize(file) !== normalize(orphan.file));
+            state.songs.push({
+                title: titleFromFile(orphan.file),
+                artist: DEFAULT_ARTIST,
+                file: orphan.file,
+                duration: info.duration,
+                bytes: info.bytes,
+                lyrics: [],
+                albumId: orphan.albumId,
+                source: 'existing',
+                blob: null
+            });
+            markDirty();
+            render();
+            flash(`Added ${orphan.file} to the playlist. Check its title and artist, then save.`);
+        }
+
+        function readDuration(file) {
+            return new Promise(resolve => {
+                const url = URL.createObjectURL(file);
+                const probe = new Audio();
+                let settled = false;
+                const finish = seconds => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    probe.removeAttribute('src');
+                    URL.revokeObjectURL(url);
+                    resolve(Number.isFinite(seconds) && seconds > 0 ? seconds : 0);
+                };
+                const timer = setTimeout(() => finish(0), 20000);
+                probe.preload = 'metadata';
+                probe.addEventListener('loadedmetadata', () => finish(probe.duration), { once: true });
+                probe.addEventListener('error', () => finish(0), { once: true });
+                probe.src = url;
+            });
+        }
+
+        async function addSongs(files) {
+            if (!files.length || state.busy) return;
+            const albumId = plAlbum.value || (state.albums[0] ? state.albums[0].id : '');
+            const added = [];
+            const skipped = [];
+            setBusy(true, 'Reading the new songs…');
+            try {
+                for (const file of files) {
+                    const name = safeFileName(file.name);
+                    if (!AUDIO_NAME.test(name)) {
+                        skipped.push(`${file.name} is not a supported audio file`);
+                        continue;
+                    }
+                    if (state.songs.some(song => normalize(song.file) === normalize(name))
+                        || added.some(song => normalize(song.file) === normalize(name))) {
+                        skipped.push(`${name} is already in the playlist`);
+                        continue;
+                    }
+                    const duration = await readDuration(file);
+                    added.push({
+                        title: titleFromFile(name),
+                        artist: DEFAULT_ARTIST,
+                        file: name,
+                        duration: Math.round(duration),
+                        bytes: file.size,
+                        lyrics: [],
+                        albumId,
+                        source: 'new',
+                        blob: file
+                    });
+                }
+            } finally {
+                setBusy(false);
+            }
+
+            if (added.length) {
+                let insertAt = state.songs.length;
+                for (let i = state.songs.length - 1; i >= 0; i -= 1) {
+                    if (state.songs[i].albumId === albumId) {
+                        insertAt = i + 1;
+                        break;
+                    }
+                }
+                state.songs.splice(insertAt, 0, ...added);
+                markDirty();
+                render();
+            }
+
+            const parts = [];
+            if (added.length) {
+                const album = state.albums.find(candidate => candidate.id === albumId);
+                parts.push(`Added ${added.length} song${added.length === 1 ? '' : 's'}${album ? ` to ${album.title}` : ''}.`);
+            }
+            const missingLength = added.filter(song => !song.duration).map(song => song.file);
+            if (missingLength.length) parts.push(`Could not read the length of ${missingLength.join(', ')} — type it into the length field.`);
+            if (skipped.length) parts.push(`Skipped: ${skipped.join('; ')}.`);
+            if (added.length || skipped.length) parts.push('Save to write the files.');
+            flash(parts.join(' '), skipped.length && !added.length ? 'bad' : '');
+        }
+
+        // ---------- building the files ----------
+
+        function formatTimeValue(value) {
+            return String(Math.round((Number(value) || 0) * 10) / 10);
+        }
+
+        function buildPlaylistText() {
+            const eol = state.eol;
+            const songs = orderedSongs();
+            const entries = songs.map((song, index) => {
+                const lines = [
+                    '    {',
+                    `        title: ${JSON.stringify(song.title.trim())},`,
+                    `        artist: ${JSON.stringify((song.artist || DEFAULT_ARTIST).trim())},`,
+                    `        file: ${JSON.stringify(song.file)},`,
+                    `        duration: ${Math.round(song.duration) || 0},`,
+                    `        bytes: ${Math.round(song.bytes) || 0},`,
+                    '        lyrics: ['
+                ];
+                song.lyrics.forEach(line => {
+                    lines.push(`            { time: ${formatTimeValue(line.time)}, text: ${JSON.stringify(line.text)} },`);
+                });
+                lines.push('        ]');
+                lines.push(`    }${index === songs.length - 1 ? '' : ','}`);
+                return lines.join(eol);
+            });
+            return `window.myPlaylist = [${eol}${entries.join(eol)}${eol}];${eol}`;
+        }
+
+        function bracketPairs(masked) {
+            const pairs = new Map();
+            const stack = [];
+            for (let i = 0; i < masked.length; i += 1) {
+                const ch = masked[i];
+                if (ch === '[' || ch === '{') stack.push(i);
+                else if (ch === ']' || ch === '}') {
+                    const open = stack.pop();
+                    if (open != null) pairs.set(open, i);
+                }
+            }
+            return pairs;
+        }
+
+        // Blanks out comments and string contents so bracket matching and key
+        // lookups cannot be fooled by a quote or bracket inside a title.
+        function maskJs(text) {
+            const chars = text.split('');
+            let i = 0;
+            const n = text.length;
+            while (i < n) {
+                const ch = text[i];
+                if (ch === '/' && text[i + 1] === '/') {
+                    while (i < n && text[i] !== '\n') { chars[i] = ' '; i += 1; }
+                    continue;
+                }
+                if (ch === '/' && text[i + 1] === '*') {
+                    const end = text.indexOf('*/', i + 2);
+                    const stop = end < 0 ? n : end + 2;
+                    while (i < stop) { chars[i] = ' '; i += 1; }
+                    continue;
+                }
+                if (ch === '"' || ch === "'" || ch === '`') {
+                    const quote = ch;
+                    chars[i] = ' ';
+                    i += 1;
+                    while (i < n) {
+                        if (text[i] === '\\') {
+                            chars[i] = ' ';
+                            if (i + 1 < n) chars[i + 1] = ' ';
+                            i += 2;
+                            continue;
+                        }
+                        if (text[i] === quote) { chars[i] = ' '; i += 1; break; }
+                        chars[i] = ' ';
+                        i += 1;
+                    }
+                    continue;
+                }
+                i += 1;
+            }
+            return chars.join('');
+        }
+
+        // Finds the `tracks: [ ... ]` array of every album object, in order.
+        function locateAlbumTrackArrays(source) {
+            const masked = maskJs(source);
+            const assignment = /window\.myAlbums\s*=\s*\[/.exec(masked);
+            if (!assignment) return null;
+            const pairs = bracketPairs(masked);
+            const arrayOpen = assignment.index + assignment[0].length - 1;
+            const arrayClose = pairs.get(arrayOpen);
+            if (arrayClose == null) return null;
+
+            const objects = [];
+            let i = arrayOpen + 1;
+            while (i < arrayClose) {
+                if (masked[i] === '{') {
+                    const close = pairs.get(i);
+                    if (close == null || close > arrayClose) break;
+                    objects.push([i, close]);
+                    i = close + 1;
+                    continue;
+                }
+                i += 1;
+            }
+
+            const spots = [];
+            objects.forEach(([start, end], index) => {
+                const match = /(^|[\s,{])tracks\s*:\s*\[/.exec(masked.slice(start, end + 1));
+                if (!match) return;
+                const open = start + match.index + match[0].length - 1;
+                const close = pairs.get(open);
+                if (close == null) return;
+                spots.push({ index, start: open, end: close });
+            });
+            return spots;
+        }
+
+        function buildArrayBody(source, open, files, eol) {
+            if (!files.length) return '';
+            const lineStart = source.lastIndexOf('\n', open) + 1;
+            const baseIndent = /^[ \t]*/.exec(source.slice(lineStart))[0];
+            const entryIndent = baseIndent + '    ';
+            const entries = files.map(file => `${entryIndent}${quoteSingle(file)}`);
+            return eol + entries.join(',' + eol) + eol + baseIndent;
+        }
+
+        function buildRemixesText(source) {
+            if (!source) return regeneratedRemixesText();
+            const spots = locateAlbumTrackArrays(source);
+            if (!spots || spots.length !== state.albums.length) {
+                throw new Error('remixes.js could not be matched to its album list, so it was left unchanged. Reopen the project folder (or reload) and try again.');
+            }
+            const eol = source.includes('\r\n') ? '\r\n' : '\n';
+            let text = source;
+            spots.sort((a, b) => b.start - a.start).forEach(spot => {
+                const album = state.albums[spot.index];
+                // Custom track objects are left alone; the manager only owns
+                // playlist file names.
+                if (album.hasObjectTracks) return;
+                const files = albumFileList(album);
+                text = text.slice(0, spot.start + 1)
+                    + buildArrayBody(source, spot.start, files, eol)
+                    + text.slice(spot.end);
+            });
+            return text;
+        }
+
+        // Only used when remixes.js cannot be read (for example on file://).
+        function regeneratedRemixesText() {
+            const eol = state.eol;
+            const rows = state.albums.map(album => {
+                const lines = ['    {'];
+                ['id', 'title', 'art', 'thumb', 'background', 'backgroundTall', 'accent'].forEach(key => {
+                    const value = key === 'id' ? album.id : key === 'title' ? album.title : album.config[key];
+                    if (value == null || value === '') return;
+                    lines.push(`        ${key}: ${quoteSingle(value)},`);
+                });
+                const files = albumFileList(album);
+                if (!files.length) {
+                    lines.push('        tracks: []');
+                } else {
+                    lines.push('        tracks: [');
+                    files.forEach((file, index) => {
+                        lines.push(`            ${quoteSingle(file)}${index === files.length - 1 ? '' : ','}`);
+                    });
+                    lines.push('        ]');
+                }
+                lines.push('    }');
+                return lines.join(eol);
+            });
+            const header = '// Album definitions for the Tracks panel. Rebuilt by lyrics-editor.html;'
+                + eol + '// comments and custom track entries are replaced when the file is regenerated.'
+                + eol + eol;
+            return `${header}window.myAlbums = [${eol}${rows.join(',' + eol)}${eol}];${eol}`;
+        }
+
+        function evaluateLibrary(text, key) {
+            const sandbox = {};
+            new Function('window', `"use strict";\n${text}`)(sandbox);
+            const value = sandbox[key];
+            if (!Array.isArray(value)) throw new Error(`it did not define ${key}`);
+            return value;
+        }
+
+        function verifyOutput(playlistText, remixesText) {
+            const tracks = evaluateLibrary(playlistText, 'myPlaylist');
+            if (tracks.length !== state.songs.length) {
+                throw new Error('The generated playlist did not contain every track, so nothing was saved.');
+            }
+            const albums = evaluateLibrary(remixesText, 'myAlbums');
+            if (albums.length !== state.albums.length) {
+                throw new Error('The generated remixes.js did not contain every album, so nothing was saved.');
+            }
+        }
+
+        function validate() {
+            const problems = [];
+            if (!state.songs.length) problems.push('Add at least one song.');
+            if (!state.albums.length) problems.push('remixes.js did not define any albums.');
+            const seen = new Set();
+            state.songs.forEach((song, index) => {
+                const label = song.title.trim() || song.file || `Track ${index + 1}`;
+                if (!song.title.trim()) problems.push(`${label}: add a title.`);
+                if (!song.file.trim()) problems.push(`${label}: the file name is missing.`);
+                else if (!AUDIO_NAME.test(song.file)) problems.push(`${label}: ${song.file} is not an audio file name.`);
+                if (/[\\/]/.test(song.file) || song.file.includes('..')) problems.push(`${label}: the file name must not contain a folder.`);
+                if (!Number.isFinite(song.duration) || song.duration <= 0) problems.push(`${label}: set the length in minutes:seconds.`);
+                const key = normalize(song.file);
+                if (seen.has(key)) problems.push(`${label}: ${song.file} is in the playlist twice.`);
+                seen.add(key);
+            });
+            return problems;
+        }
+
+        // ---------- file access ----------
+
+        async function readText(dir, name) {
+            const handle = await dir.getFileHandle(name);
+            return (await handle.getFile()).text();
+        }
+
+        async function writeText(dir, name, text) {
+            const handle = await dir.getFileHandle(name);
+            const writable = await handle.createWritable();
+            await writable.write(text);
+            await writable.close();
+        }
+
+        async function fileExists(dir, name) {
+            try {
+                await dir.getFileHandle(name);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        async function ensurePermission(dir) {
+            const options = { mode: 'readwrite' };
+            if (typeof dir.queryPermission === 'function' && await dir.queryPermission(options) === 'granted') return true;
+            if (typeof dir.requestPermission === 'function') {
+                return (await dir.requestPermission(options)) === 'granted';
+            }
+            return false;
+        }
+
+        // ---------- auto-time scratch files ----------
+
+        // The lyrics studio hands whisper.cpp its lyrics through the linked
+        // folder: a .txt in .autotime/ goes in, the .lrc the script writes comes
+        // back out. It lives in its own folder so the project root stays clean.
+        const AUTOTIME_DIR = '.autotime';
+
+        async function autoTimeDir(create) {
+            const dir = state.dirHandle;
+            if (!dir) throw new Error('no project folder is linked');
+            if (!(await ensurePermission(dir))) throw new Error('write permission for the project folder was not granted');
+            return dir.getDirectoryHandle(AUTOTIME_DIR, { create });
+        }
+
+        async function writeAutoTime(name, text) {
+            const dir = await autoTimeDir(true);
+            const handle = await dir.getFileHandle(name, { create: true });
+            const writable = await handle.createWritable();
+            await writable.write(text);
+            await writable.close();
+        }
+
+        async function readAutoTime(name) {
+            try {
+                const dir = await autoTimeDir(false);
+                const file = await (await dir.getFileHandle(name)).getFile();
+                return { text: await file.text(), lastModified: file.lastModified };
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Only used before a folder is linked: reads remixes.js fresh so its
+        // comments survive the rewrite. Falls back to the last copy seen, then to
+        // a regenerated file when it cannot be read at all (file://, offline).
+        async function sourceRemixesText() {
+            if (state.baseline.remixes) return state.baseline.remixes;
+            try {
+                const response = await fetch('remixes.js', { cache: 'no-store' });
+                if (response.ok) {
+                    state.remixesSource = await response.text();
+                    return state.remixesSource;
+                }
+            } catch (error) { /* file:// or offline */ }
+            return state.remixesSource;
+        }
+
+        function saveBlob(blob, name) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name;
+            link.rel = 'noopener';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }
+
+        function studioTracks() {
+            return orderedSongs().map(song => ({
+                title: song.title.trim(),
+                artist: (song.artist || DEFAULT_ARTIST).trim(),
+                file: song.file,
+                duration: Math.round(song.duration),
+                bytes: Math.round(song.bytes),
+                lyrics: song.lyrics.map(line => ({ time: line.time, text: line.text }))
+            }));
+        }
+
+        function studioAlbums() {
+            return state.albums.map(album => ({
+                ...album.config,
+                id: album.id,
+                title: album.title,
+                tracks: albumFileList(album)
+            }));
+        }
+
+        function syncStudio() {
+            const tracks = studioTracks();
+            const albums = studioAlbums();
+            state.albums.forEach((album, index) => { album.config = albums[index]; });
+            if (window.lyricsStudio && typeof window.lyricsStudio.setLibrary === 'function') {
+                window.lyricsStudio.setLibrary(tracks, albums);
+            }
+        }
+
+        async function saveToFolder(playlistText, remixesText) {
+            const dir = state.dirHandle;
+            if (!(await ensurePermission(dir))) {
+                throw new Error('Write permission for the project folder was not granted.');
+            }
+            const playlistNow = await readText(dir, 'playlist.js');
+            const remixesNow = await readText(dir, 'remixes.js');
+            if (playlistNow !== state.baseline.playlist || remixesNow !== state.baseline.remixes) {
+                throw new Error('playlist.js or remixes.js changed on disk after this page loaded. Reopen the folder to pick up those edits.');
+            }
+
+            const music = await dir.getDirectoryHandle('music');
+            const fresh = state.songs.filter(song => song.source === 'new');
+            const toWrite = [];
+            for (const song of fresh) {
+                if (!(await fileExists(music, song.file))) {
+                    toWrite.push(song);
+                    continue;
+                }
+                // The same audio may already be in music/ because it was added by
+                // hand. If the size matches, keep the file and just add the entry;
+                // a different file under that name is never overwritten.
+                const existing = await (await music.getFileHandle(song.file)).getFile();
+                if (existing.size !== song.bytes) {
+                    throw new Error(`music/${song.file} already exists and is a different file. Rename the new one, then add it again.`);
+                }
+            }
+            for (const song of toWrite) {
+                const handle = await music.getFileHandle(song.file, { create: true });
+                const writable = await handle.createWritable();
+                await writable.write(song.blob);
+                await writable.close();
+            }
+            await writeText(dir, 'playlist.js', playlistText);
+            await writeText(dir, 'remixes.js', remixesText);
+
+            fresh.forEach(song => {
+                song.source = 'existing';
+                song.blob = null;
+            });
+            state.baseline = { playlist: playlistText, remixes: remixesText };
+            state.remixesSource = remixesText;
+            state.dirty = false;
+            state.savedOnce = true;
+            syncStudio();
+            render();
+        }
+
+        async function downloadOutput(playlistText, remixesText) {
+            const fresh = state.songs.filter(song => song.source === 'new');
+            fresh.forEach(song => saveBlob(song.blob, song.file));
+            saveBlob(new Blob([playlistText], { type: 'text/javascript;charset=utf-8' }), 'playlist.js');
+            saveBlob(new Blob([remixesText], { type: 'text/javascript;charset=utf-8' }), 'remixes.js');
+
+            const parts = ['Downloaded playlist.js and remixes.js.'];
+            if (fresh.length) {
+                parts.push(`${fresh.length} new audio file${fresh.length === 1 ? '' : 's'} downloaded too; move ${fresh.length === 1 ? 'it' : 'them'} into music/ and replace the two script files in the project.`);
+            } else {
+                parts.push('Replace the two script files in the project folder.');
+            }
+            parts.push('If the browser asks about multiple downloads, allow them.');
+            flash(parts.join(' '));
+
+            fresh.forEach(song => {
+                song.source = 'existing';
+                song.blob = null;
+            });
+            state.dirty = false;
+            state.savedOnce = true;
+            render();
+        }
+
+        function setBusy(busy, message) {
+            state.busy = busy;
+            renderSaveState();
+            if (message) flash(message);
+        }
+
+        async function save() {
+            if (state.busy) return;
+            const problems = validate();
+            if (problems.length) {
+                flash(problems.slice(0, 3).join(' ') + (problems.length > 3 ? ` (+${problems.length - 3} more)` : ''), 'bad');
+                return;
+            }
+            setBusy(true, 'Preparing the files…');
+            try {
+                const playlistText = buildPlaylistText();
+                const remixesText = buildRemixesText(await sourceRemixesText());
+                verifyOutput(playlistText, remixesText);
+                if (state.dirHandle) {
+                    await saveToFolder(playlistText, remixesText);
+                    flash(`Saved ${state.songs.length} tracks into the project. Reload the player to hear the new playlist.`);
+                } else {
+                    await downloadOutput(playlistText, remixesText);
+                }
+            } catch (error) {
+                flash(error && error.message ? error.message : 'Could not save the playlist.', 'bad');
+            } finally {
+                setBusy(false);
+                renderSaveState();
+            }
+        }
+
+        async function downloadOnly() {
+            if (state.busy) return;
+            const problems = validate();
+            if (problems.length) {
+                flash(problems.slice(0, 3).join(' '), 'bad');
+                return;
+            }
+            setBusy(true, 'Preparing the files…');
+            try {
+                const playlistText = buildPlaylistText();
+                const remixesText = buildRemixesText(await sourceRemixesText());
+                verifyOutput(playlistText, remixesText);
+                await downloadOutput(playlistText, remixesText);
+            } catch (error) {
+                flash(error && error.message ? error.message : 'Could not prepare the files.', 'bad');
+            } finally {
+                setBusy(false);
+                renderSaveState();
+            }
+        }
+
+        async function openFolder() {
+            if (!window.showDirectoryPicker) {
+                flash('This browser cannot write to a folder. Use “Download updated files” instead, or open this page in Chrome or Edge.', 'bad');
+                return;
+            }
+            let dir;
+            try {
+                dir = await window.showDirectoryPicker({ id: 'borderline-project', mode: 'readwrite' });
+            } catch (error) {
+                if (error && error.name !== 'AbortError') flash('That folder could not be opened.', 'bad');
+                return;
+            }
+            setBusy(true, 'Reading the project files…');
+            try {
+                const playlistText = await readText(dir, 'playlist.js');
+                const remixesText = await readText(dir, 'remixes.js');
+                await dir.getDirectoryHandle('music');
+                const tracks = evaluateLibrary(playlistText, 'myPlaylist');
+                const albums = evaluateLibrary(remixesText, 'myAlbums');
+                state.dirHandle = dir;
+                state.baseline = { playlist: playlistText, remixes: remixesText };
+                state.remixesSource = remixesText;
+                state.eol = playlistText.includes('\r\n') ? '\r\n' : '\n';
+                loadLibrary(tracks, albums);
+                if (window.lyricsStudio && typeof window.lyricsStudio.setLibrary === 'function') {
+                    window.lyricsStudio.setLibrary(tracks, albums);
+                }
+                plFolderHint.textContent = 'Linked to the project folder. Saving updates playlist.js and the album track lists in remixes.js in place, and copies new audio into music/.';
+                render();
+                flash('Folder linked. Saved changes are written straight into the project.');
+            } catch (error) {
+                state.dirHandle = null;
+                const missingFile = error && (error.name === 'NotFoundError' || /could not be found/i.test(error.message || ''));
+                flash(missingFile
+                    ? 'That folder is missing playlist.js, remixes.js or the music/ folder. Choose the project folder that holds them.'
+                    : `That folder could not be used: ${error && error.message ? error.message : 'unknown error'}.`, 'bad');
+                renderSaveState();
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        // ---------- tabs ----------
+
+        function selectTab(name, focus) {
+            const lyrics = name !== 'playlist';
+            panelLyrics.hidden = !lyrics;
+            panelPlaylist.hidden = lyrics;
+            tabLyrics.setAttribute('aria-selected', String(lyrics));
+            tabPlaylist.setAttribute('aria-selected', String(!lyrics));
+            tabLyrics.tabIndex = lyrics ? 0 : -1;
+            tabPlaylist.tabIndex = lyrics ? -1 : 0;
+            document.body.classList.toggle('playlist-mode', !lyrics);
+            mobileBar.hidden = !lyrics;
+            if (focus) (lyrics ? tabLyrics : tabPlaylist).focus();
+        }
+
+        tabLyrics.addEventListener('click', () => selectTab('lyrics'));
+        tabPlaylist.addEventListener('click', () => selectTab('playlist'));
+        [tabLyrics, tabPlaylist].forEach(tab => {
+            tab.addEventListener('keydown', event => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault();
+                selectTab(tab === tabLyrics ? 'playlist' : 'lyrics', true);
+            });
+        });
+
+        // ---------- events ----------
+
+        plAdd.addEventListener('click', () => plFiles.click());
+        plFiles.addEventListener('change', () => {
+            const files = Array.from(plFiles.files || []);
+            plFiles.value = '';
+            addSongs(files);
+        });
+        plOpen.addEventListener('click', openFolder);
+        plSave.addEventListener('click', save);
+        plDownload.addEventListener('click', downloadOnly);
+
+        window.addEventListener('beforeunload', event => {
+            if (!state.dirty) return;
+            event.preventDefault();
+            event.returnValue = '';
+        });
+
+        // ---------- start ----------
+
+        loadLibrary(window.myPlaylist, window.myAlbums);
+
+        if (!window.showDirectoryPicker) {
+            plOpen.hidden = true;
+            plFolderHint.textContent = 'This browser cannot write to a folder, so saving downloads playlist.js, remixes.js and any new audio for you to move into the project. Chrome or Edge can write in place.';
+        }
+
+        render();
+        selectTab('lyrics');
+
+        // Small hook for checking the generated files from the console.
+        window.playlistManager = {
+            state: () => ({
+                dirty: state.dirty,
+                linked: Boolean(state.dirHandle),
+                songs: state.songs.map(song => ({ ...song, blob: song.blob ? 'File' : null })),
+                albums: state.albums.map(album => ({ id: album.id, title: album.title, preserved: album.preserved })),
+                orphans: state.orphans.slice()
+            }),
+            buildPlaylist: () => buildPlaylistText(),
+            buildRemixes: async () => buildRemixesText(await sourceRemixesText()),
+            reload: (tracks, albums) => {
+                loadLibrary(tracks || window.myPlaylist, albums || window.myAlbums);
+                render();
+            },
+            save,
+            selectTab,
+            autoTime: {
+                linked: () => Boolean(state.dirHandle),
+                link: async () => {
+                    await openFolder();
+                    return Boolean(state.dirHandle);
+                },
+                write: writeAutoTime,
+                read: readAutoTime
+            }
         };
     })();
     </script>
